@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { ROLES, type Rol } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { DEFAULT_TZ } from "@/lib/dates";
 import { homeFor } from "@/lib/routes";
 
 export type CurrentUser = {
@@ -12,6 +13,8 @@ export type CurrentUser = {
   email: string;
   role: Rol;
   mustChangePassword: boolean;
+  zonaHoraria: string;
+  duracionSesionMin: number;
 };
 
 /** Lee la sesión una sola vez por petición. */
@@ -29,10 +32,19 @@ export async function requireUser(options: { allowPasswordChange?: boolean } = {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const { id, name, email, role, mustChangePassword } = session.user;
+  const { id, name, email, role, mustChangePassword, zonaHoraria, duracionSesionMin } =
+    session.user;
   if (mustChangePassword && !options.allowPasswordChange) redirect("/cambiar-contrasena");
 
-  return { id, name, email, role: toRol(role), mustChangePassword } satisfies CurrentUser;
+  return {
+    id,
+    name,
+    email,
+    role: toRol(role),
+    mustChangePassword,
+    zonaHoraria: zonaHoraria || DEFAULT_TZ,
+    duracionSesionMin: duracionSesionMin || 50,
+  } satisfies CurrentUser;
 }
 
 /** Exige un rol concreto; si no coincide, redirige al inicio de su rol. */

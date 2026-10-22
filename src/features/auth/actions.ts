@@ -78,11 +78,13 @@ export async function cambiarContrasena(
     };
   }
 
+  // Primer ingreso: se libera la cuenta y se envía a su inicio.
   if (user.mustChangePassword) {
     await db.update(userTable).set({ mustChangePassword: false }).where(eq(userTable.id, user.id));
+    redirect(homeFor(user.role));
   }
 
-  redirect(homeFor(user.role));
+  return { ok: true, message: "Contraseña actualizada. Cerramos tus otras sesiones abiertas." };
 }
 
 export async function cerrarSesion() {

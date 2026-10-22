@@ -25,6 +25,8 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       mustChangePassword: { type: "boolean", defaultValue: true, input: false },
+      zonaHoraria: { type: "string", defaultValue: "America/Mexico_City", input: false },
+      duracionSesionMin: { type: "number", defaultValue: 50, input: false },
     },
   },
   rateLimit: {

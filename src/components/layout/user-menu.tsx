@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyRoundIcon, LogOutIcon, UserRoundCogIcon } from "lucide-react";
+import { LogOutIcon, UserRoundCogIcon } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -41,12 +41,7 @@ export function UserMenu({ name, email, roleLabel }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/perfil">
-            <UserRoundCogIcon /> Mi perfil
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/cambiar-contrasena">
-            <KeyRoundIcon /> Cambiar contraseña
+            <UserRoundCogIcon /> Mi perfil y seguridad
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

@@ -45,6 +45,30 @@ export function likePattern(q: string): string {
   return `%${q.replace(/[%_\\]/g, "").trim()}%`;
 }
 
+const FECHA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+function esFechaValida(v: string) {
+  if (!FECHA_ISO.test(v)) return false;
+  const d = new Date(`${v}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().startsWith(v);
+}
+
+/** Fecha opcional (YYYY-MM-DD de un <input type="date">); "" → null. */
+export const optionalDate = (opts: { noFutura?: boolean } = {}) =>
+  z
+    .string()
+    .trim()
+    .transform((v) => (v === "" ? null : v))
+    .refine((v) => v === null || esFechaValida(v), "Escribe una fecha válida.")
+    .refine(
+      (v) => !opts.noFutura || v === null || v <= new Date().toISOString().slice(0, 10),
+      "La fecha no puede ser futura.",
+    )
+    .nullish();
+
+/** Checkbox de formulario: presente ("on") → true, ausente → false. */
+export const checkbox = z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean());
+
 /** Correo opcional de formulario. */
 export const optionalEmail = z
   .string()
