@@ -20,7 +20,7 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 12, // 12 h
     updateAge: 60 * 60, // renueva cada hora de uso
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
+    // Sin cookieCache: los cambios de rol, suspensión o contraseña aplican de inmediato.
   },
   user: {
     additionalFields: {

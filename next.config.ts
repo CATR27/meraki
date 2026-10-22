@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   serverExternalPackages: ["@libsql/client"],
+  experimental: {
+    // Las vistas privadas dependen de la sesión y de datos clínicos sin caché (por diseño);
+    // solo validamos navegación instantánea en segmentos que exporten `instant` explícitamente.
+    instantInsights: { validationLevel: "manual-warning" },
+  },
   turbopack: {
     rules: {
       "*.css": {
