@@ -16,6 +16,35 @@ export const optionalText = (max = 2000) =>
     .transform((v) => (v === "" ? null : v))
     .nullish();
 
+/** Entero opcional de formulario ("" → null). */
+export const optionalInt = (min: number, max: number) =>
+  z
+    .string()
+    .trim()
+    .transform((v) => (v === "" ? null : Number(v)))
+    .pipe(
+      z
+        .number({ error: "Escribe un número." })
+        .int("Usa un número entero.")
+        .min(min, `El mínimo es ${min}.`)
+        .max(max, `El máximo es ${max}.`)
+        .nullable(),
+    )
+    .nullish();
+
+/** Entero obligatorio de formulario. */
+export const requiredInt = (min: number, max: number) =>
+  z.coerce
+    .number({ error: "Escribe un número." })
+    .int("Usa un número entero.")
+    .min(min, `El mínimo es ${min}.`)
+    .max(max, `El máximo es ${max}.`);
+
+/** Quita comodines de LIKE para que la búsqueda sea literal. */
+export function likePattern(q: string): string {
+  return `%${q.replace(/[%_\\]/g, "").trim()}%`;
+}
+
 /** Correo opcional de formulario. */
 export const optionalEmail = z
   .string()

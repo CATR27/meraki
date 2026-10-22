@@ -3,7 +3,13 @@ import type { ActionState } from "@/lib/action-state";
 import { cn } from "@/lib/utils";
 
 /** Mensaje general (éxito/error) devuelto por una Server Action. */
-export function FormMessage({ state, className }: { state: ActionState; className?: string }) {
+export function FormMessage({
+  state,
+  className,
+}: {
+  state: ActionState<unknown>;
+  className?: string;
+}) {
   if (!state?.message) return null;
   const Icon = state.ok ? CircleCheckIcon : CircleAlertIcon;
 

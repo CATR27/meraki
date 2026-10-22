@@ -34,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="es" className={`${nunito.variable} ${quicksand.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <TooltipProvider>{children}</TooltipProvider>
-        <Toaster theme="light" position="top-right" richColors closeButton />
+        <Toaster theme="light" position="bottom-right" richColors closeButton />
       </body>
     </html>
   );
