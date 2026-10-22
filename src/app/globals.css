@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Escala de marca Meraki: lilas pastel con acentos de morado fuerte */
+@theme {
+  --color-lavanda-50: #f7f3fd;
+  --color-lavanda-100: #efe6fb;
+  --color-lavanda-200: #e0d0f7;
+  --color-lavanda-300: #c9aef0;
+  --color-lavanda-400: #b08be6;
+  --color-lavanda-500: #9466d9;
+  --color-lavanda-600: #7a45c6;
+  --color-lavanda-700: #6534a8;
+  --color-lavanda-800: #4f2985;
+  --color-lavanda-900: #3a1f61;
+  --color-lavanda-950: #24133f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-nunito);
+  --font-heading: var(--font-quicksand);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #fcfaff;
+  --foreground: #2a1b45;
+  --card: #ffffff;
+  --card-foreground: #2a1b45;
+  --popover: #ffffff;
+  --popover-foreground: #2a1b45;
+  --primary: var(--color-lavanda-700);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-lavanda-100);
+  --secondary-foreground: var(--color-lavanda-800);
+  --muted: #f4effb;
+  --muted-foreground: #6b5f80;
+  --accent: var(--color-lavanda-200);
+  --accent-foreground: var(--color-lavanda-900);
+  --destructive: #c2416b;
+  --destructive-soft: #fbe4ec;
+  --success: #3f8f6b;
+  --success-soft: #e3f2ea;
+  --warning: #b4641e;
+  --warning-soft: #fdebdc;
+  --border: #e6dcf5;
+  --input: #dccdf2;
+  --ring: var(--color-lavanda-500);
+  --chart-1: var(--color-lavanda-300);
+  --chart-2: var(--color-lavanda-500);
+  --chart-3: var(--color-lavanda-700);
+  --chart-4: #e7a6c4;
+  --chart-5: #8cc6aa;
+  --radius: 0.875rem;
+  --sidebar: var(--color-lavanda-50);
+  --sidebar-foreground: #2a1b45;
+  --sidebar-primary: var(--color-lavanda-700);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-lavanda-100);
+  --sidebar-accent-foreground: var(--color-lavanda-800);
+  --sidebar-border: #e6dcf5;
+  --sidebar-ring: var(--color-lavanda-500);
+}
+
+.dark {
+  --background: #160f22;
+  --foreground: #f1eafc;
+  --card: #1f1631;
+  --card-foreground: #f1eafc;
+  --popover: #1f1631;
+  --popover-foreground: #f1eafc;
+  --primary: var(--color-lavanda-400);
+  --primary-foreground: var(--color-lavanda-950);
+  --secondary: #2c2045;
+  --secondary-foreground: var(--color-lavanda-100);
+  --muted: #2a1f3f;
+  --muted-foreground: #b6a8cc;
+  --accent: #342552;
+  --accent-foreground: var(--color-lavanda-100);
+  --destructive: #f07a9f;
+  --destructive-soft: #3d1a29;
+  --success: #7ccaa3;
+  --success-soft: #16301f;
+  --warning: #f0a868;
+  --warning-soft: #3a2614;
+  --border: #33264c;
+  --input: #3d2e59;
+  --ring: var(--color-lavanda-400);
+  --sidebar: #1a1229;
+  --sidebar-foreground: #f1eafc;
+  --sidebar-primary: var(--color-lavanda-400);
+  --sidebar-primary-foreground: var(--color-lavanda-950);
+  --sidebar-accent: #2c2045;
+  --sidebar-accent-foreground: var(--color-lavanda-100);
+  --sidebar-border: #33264c;
+  --sidebar-ring: var(--color-lavanda-400);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading tracking-tight text-lavanda-950 dark:text-lavanda-50;
+  }
+}
