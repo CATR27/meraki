@@ -5,7 +5,10 @@ import { admin } from "better-auth/plugins";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { env } from "@/lib/env";
+import { crearLimitador } from "@/lib/limitador";
 import { ac, roles } from "@/lib/permissions";
+
+export const limitador = crearLimitador(db);
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
@@ -33,8 +36,11 @@ export const auth = betterAuth({
     enabled: true,
     window: 60,
     max: 100,
+    // En la BD (no en memoria) para que el límite se comparta entre instancias.
+    customStorage: limitador,
     customRules: {
       "/sign-in/email": { window: 60, max: 5 },
+      "/change-password": { window: 60, max: 5 },
     },
   },
   plugins: [

@@ -7,8 +7,9 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { user as userTable } from "@/db/schema";
 import { type ActionState, formValues, zodErrorState } from "@/lib/action-state";
-import { auth } from "@/lib/auth";
+import { auth, limitador } from "@/lib/auth";
 import { requireUser } from "@/lib/dal";
+import { claveLimite, ipCliente } from "@/lib/limitador";
 import { homeFor, safeRedirectPath } from "@/lib/routes";
 import { cambiarContrasenaSchema, loginSchema } from "./schemas";
 
@@ -35,12 +36,30 @@ export async function iniciarSesion(_prev: ActionState, formData: FormData): Pro
   const parsed = loginSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return zodErrorState(parsed.error, values);
 
+  // Las llamadas a auth.api no pasan por el limitador HTTP de Better Auth: se limita aquí,
+  // por IP (protege contra barridos) y por correo (protege cada cuenta).
+  const h = await headers();
+  const claveCorreo = claveLimite("login:correo", parsed.data.email);
+  const [porIp, porCorreo] = await Promise.all([
+    limitador.consume(claveLimite("login:ip", ipCliente(h)), { window: 15 * 60, max: 30 }),
+    limitador.consume(claveCorreo, { window: 15 * 60, max: 8 }),
+  ]);
+  if (!porIp.allowed || !porCorreo.allowed) {
+    const minutos = Math.ceil(Math.max(porIp.retryAfter ?? 0, porCorreo.retryAfter ?? 0) / 60);
+    return {
+      ok: false,
+      message: `Demasiados intentos. Inténtalo de nuevo en ${minutos} ${minutos === 1 ? "minuto" : "minutos"}.`,
+      values,
+    };
+  }
+
   let destino: string;
   try {
     const { user } = await auth.api.signInEmail({
       body: { email: parsed.data.email, password: parsed.data.password },
-      headers: await headers(),
+      headers: h,
     });
+    await limitador.limpiar(claveCorreo);
     const rol = user.role === "admin" ? "admin" : "psicologo";
     destino = user.mustChangePassword
       ? "/cambiar-contrasena"

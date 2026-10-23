@@ -101,6 +101,13 @@ export const verification = sqliteTable(
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 );
 
+/** Contadores de límite de intentos (login y endpoints de Better Auth). */
+export const limites = sqliteTable("limites", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  resetAt: integer("reset_at").notNull(), // epoch ms
+});
+
 /* ───────────────────────────────── Dominio ───────────────────────────────── */
 
 export const ESTADOS_CONSULTANTE = ["activo", "alta", "baja"] as const;
