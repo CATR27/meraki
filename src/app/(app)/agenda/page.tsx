@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/shared/page-header";
 import { opcionesConsultantes } from "@/features/consultantes/queries";
 import { AgendaToolbar } from "@/features/citas/components/agenda-toolbar";
 import { type CitaDefaults, CitaDialog } from "@/features/citas/components/cita-dialog";
@@ -8,12 +7,16 @@ import { VistaLista } from "@/features/citas/components/vista-lista";
 import { VistaMes } from "@/features/citas/components/vista-mes";
 import { VistaSemana } from "@/features/citas/components/vista-semana";
 import { listarCitasRango, obtenerCita } from "@/features/citas/queries";
+import { ESTADO_CITA_BLOQUE, ESTADO_CITA_LABEL } from "@/features/citas/constantes";
 import { agendaHref } from "@/features/citas/urls";
 import { aLocal, esFechaISO, esHora, rangoVista, type Vista, VISTAS } from "@/lib/agenda";
 import { requireRole } from "@/lib/dal";
 import { hoyISO } from "@/lib/dates";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Agenda" };
+
+const LEYENDA = ["programada", "confirmada", "completada", "no_asistio", "cancelada"] as const;
 
 const texto = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
 
@@ -65,10 +68,6 @@ export default async function AgendaPage({ searchParams }: PageProps<"/agenda">)
 
   return (
     <>
-      <PageHeader
-        title="Agenda"
-        description="Tus citas de un vistazo. Toca un horario libre para agendar."
-      />
       <AgendaToolbar vista={vista} fecha={fecha} hoy={hoy} />
 
       {vista === "mes" ? (
@@ -98,6 +97,18 @@ export default async function AgendaPage({ searchParams }: PageProps<"/agenda">)
           </div>
         </>
       )}
+
+      <ul className="animate-mk-up mt-5 flex flex-wrap gap-x-[18px] gap-y-2 text-[13px] text-muted-foreground [animation-delay:200ms]">
+        {LEYENDA.map((e) => (
+          <li key={e} className="inline-flex items-center gap-2 font-semibold">
+            <span
+              aria-hidden="true"
+              className={cn("size-3.5 rounded-leaf border", ESTADO_CITA_BLOQUE[e])}
+            />
+            {ESTADO_CITA_LABEL[e]}
+          </li>
+        ))}
+      </ul>
 
       {defaults && consultantes && (
         <CitaDialog

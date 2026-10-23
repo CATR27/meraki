@@ -32,15 +32,19 @@ export function ExpedienteSecciones({ consultanteId, valores }: Props) {
           <AccordionItem
             key={s.id}
             value={s.id}
-            className="overflow-hidden rounded-2xl border bg-card px-5 last:border-b"
+            className="animate-mk-up overflow-hidden rounded-3xl border bg-card px-[22px] transition-shadow last:border-b data-[state=open]:border-lavanda-300 data-[state=open]:shadow-[0_20px_40px_-28px_rgba(101,52,168,0.55)]"
           >
-            <AccordionTrigger className="py-5 hover:no-underline">
+            <AccordionTrigger className="py-4 hover:no-underline">
               <span className="flex flex-1 flex-wrap items-center gap-x-3 gap-y-1 text-left">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-lavanda-100 font-heading font-bold text-lavanda-700">
+                <span
+                  className={`flex size-[38px] shrink-0 items-center justify-center rounded-leaf font-heading font-bold ${
+                    completa ? "bg-success text-white" : "bg-tint-2 text-deep"
+                  }`}
+                >
                   {i + 1}
                 </span>
                 <span className="grid">
-                  <span className="font-heading text-base font-bold text-lavanda-950">
+                  <span className="font-heading text-[17px] font-bold text-ink">
                     {s.titulo}
                   </span>
                   <span className="text-sm font-normal text-muted-foreground">{s.descripcion}</span>

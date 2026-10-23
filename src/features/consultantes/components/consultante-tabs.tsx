@@ -17,9 +17,9 @@ export function ConsultanteTabs({ id }: { id: string }) {
   return (
     <nav
       aria-label="Secciones del consultante"
-      className="-mx-4 mb-8 overflow-x-auto overflow-y-hidden border-b border-border/80 px-4 sm:mx-0 sm:px-0"
+      className="animate-mk-up mb-6 max-w-full overflow-x-auto [animation-delay:60ms]"
     >
-      <ul className="flex min-w-max gap-1">
+      <ul className="flex w-max gap-1 rounded-full bg-tint-2 p-[5px]">
         {tabs.map((t) => {
           const active = t.exact
             ? pathname === t.href || pathname === `${base}/editar`
@@ -30,10 +30,10 @@ export function ConsultanteTabs({ id }: { id: string }) {
                 href={t.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "-mb-px block border-b-2 px-4 py-3 text-sm font-bold transition-colors",
+                  "block rounded-full px-[18px] py-[9px] text-sm transition-colors",
                   active
-                    ? "border-lavanda-700 text-lavanda-800"
-                    : "border-transparent text-muted-foreground hover:border-lavanda-300 hover:text-lavanda-800",
+                    ? "bg-card font-extrabold text-deep shadow-[0_4px_12px_-6px_rgba(101,52,168,0.45)]"
+                    : "font-bold text-muted-foreground hover:text-deep",
                 )}
               >
                 {t.label}

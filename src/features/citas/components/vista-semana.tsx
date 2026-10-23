@@ -40,7 +40,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
     : 8 - HORA_INICIO;
 
   return (
-    <div className="overflow-hidden rounded-2xl border bg-card">
+    <div className="animate-mk-up overflow-hidden rounded-3xl border bg-card [animation-delay:100ms]">
       <ScrollAHora
         offsetPx={horaAncla * ALTO_HORA}
         className="max-h-[calc(100svh-15rem)] min-h-96 overflow-auto overscroll-contain"
@@ -48,7 +48,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
         <div className={cn(vista === "semana" && "min-w-[46rem]")}>
           {/* Encabezado de días */}
           <div
-            className="sticky top-0 z-30 grid border-b bg-lavanda-50/90 backdrop-blur"
+            className="sticky top-0 z-30 grid border-b bg-card/95 backdrop-blur"
             style={{ gridTemplateColumns: `4rem repeat(${dias.length}, minmax(0, 1fr))` }}
           >
             <div />
@@ -58,18 +58,23 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                 <Link
                   key={d}
                   href={agendaHref({ vista: "dia", fecha: d })}
-                  className="flex flex-col items-center gap-0.5 border-l py-2.5 transition-colors hover:bg-lavanda-100/60"
+                  className={cn(
+                    "flex items-center justify-center gap-2.5 border-l px-2 py-3 transition-colors hover:bg-tint-2/60",
+                    esHoy && "bg-tint",
+                  )}
                 >
-                  <span className="text-xs font-bold text-muted-foreground uppercase">
-                    {formatEnZona(inicioDelDia(d, zona), "EEE", zona)}
-                  </span>
                   <span
                     className={cn(
-                      "flex size-8 items-center justify-center rounded-full font-heading text-lg font-bold",
-                      esHoy ? "bg-lavanda-700 text-white" : "text-lavanda-950",
+                      "flex size-10 shrink-0 items-center justify-center font-heading text-lg font-bold",
+                      esHoy
+                        ? "rounded-[50%_50%_50%_12%] bg-primary text-primary-foreground"
+                        : "rounded-full text-ink",
                     )}
                   >
                     {Number(d.slice(8))}
+                  </span>
+                  <span className="hidden text-sm font-extrabold capitalize sm:block">
+                    {formatEnZona(inicioDelDia(d, zona), "EEE", zona)}
                   </span>
                 </Link>
               );
@@ -96,7 +101,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
             {dias.map((d) => (
               <div
                 key={d}
-                className={cn("relative border-l", d === hoy && "bg-lavanda-50/50")}
+                className={cn("relative border-l", d === hoy && "bg-tint")}
                 style={{ height: HORAS.length * ALTO_HORA }}
               >
                 {/* Huecos por hora: crean una cita con fecha y hora prellenadas */}
@@ -111,7 +116,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                     })}
                     scroll={false}
                     aria-label={`Agendar el ${d} a las ${h}:00`}
-                    className="absolute inset-x-0 border-t border-border/60 transition-colors hover:bg-lavanda-100/50 focus-visible:bg-lavanda-100 focus-visible:outline-none"
+                    className="absolute inset-x-0 border-t border-border/60 transition-colors hover:bg-tint-2/60 focus-visible:bg-tint-2 focus-visible:outline-none"
                     style={{ top: i * ALTO_HORA, height: ALTO_HORA }}
                   />
                 ))}
@@ -122,7 +127,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                     className="pointer-events-none absolute inset-x-0 z-20 border-t-2 border-destructive"
                     style={{ top: `${ahoraPos}%` }}
                   >
-                    <span className="absolute -top-[5px] -left-[5px] size-2 rounded-full bg-destructive" />
+                    <span className="animate-mk-pulse absolute -top-[6px] -left-[5px] size-2.5 rounded-full bg-destructive" />
                   </div>
                 )}
 
@@ -134,7 +139,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                       href={agendaHref({ vista, fecha, cita: c.id })}
                       scroll={false}
                       className={cn(
-                        "absolute inset-x-1 z-10 overflow-hidden rounded-lg border px-2 py-1 text-xs shadow-sm transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+                        "absolute inset-x-1.5 z-10 overflow-hidden rounded-2xl border px-2.5 py-2 text-xs transition-[transform,box-shadow] hover:z-20 hover:scale-[1.03] hover:shadow-[0_14px_24px_-14px_rgba(58,31,97,0.5)] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
                         ESTADO_CITA_BLOQUE[c.estado],
                       )}
                       style={{ top: `${top}%`, height: `${height}%` }}

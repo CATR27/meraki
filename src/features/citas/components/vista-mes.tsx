@@ -29,8 +29,8 @@ export function VistaMes({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border bg-card">
-      <div className="grid grid-cols-7 border-b bg-lavanda-50/80">
+    <div className="animate-mk-up overflow-hidden rounded-3xl border bg-card">
+      <div className="grid grid-cols-7 border-b bg-tint">
         {DIAS_SEMANA.map((d) => (
           <div
             key={d}
@@ -56,8 +56,8 @@ export function VistaMes({
               <Link
                 href={agendaHref({ vista: "dia", fecha: d })}
                 className={cn(
-                  "mb-1 flex size-7 items-center justify-center rounded-full text-sm font-bold transition-colors hover:bg-lavanda-100",
-                  d === hoy && "bg-lavanda-700 text-white hover:bg-lavanda-800",
+                  "mb-1 flex size-8 items-center justify-center rounded-full font-heading text-sm font-bold transition-colors hover:bg-tint-2",
+                  d === hoy && "rounded-[50%_50%_50%_12%] bg-primary text-primary-foreground hover:bg-primary/90",
                   fueraDeMes && d !== hoy && "text-muted-foreground",
                 )}
                 aria-label={`Ver el día ${d}`}
@@ -71,7 +71,7 @@ export function VistaMes({
                       href={agendaHref({ vista: "mes", fecha, cita: c.id })}
                       scroll={false}
                       className={cn(
-                        "block truncate rounded-md border px-1.5 py-0.5 text-[0.7rem] font-semibold sm:text-xs",
+                        "block truncate rounded-xl border px-1.5 py-0.5 text-[0.7rem] font-bold sm:text-xs",
                         ESTADO_CITA_BLOQUE[c.estado],
                       )}
                     >
@@ -86,7 +86,7 @@ export function VistaMes({
                   <li>
                     <Link
                       href={agendaHref({ vista: "dia", fecha: d })}
-                      className="block px-1.5 text-xs font-semibold text-lavanda-700 hover:underline"
+                      className="block px-1.5 text-xs font-bold text-deep hover:underline"
                     >
                       +{delDia.length - MAX_VISIBLES} más
                     </Link>

@@ -21,12 +21,16 @@ export async function resumenDelDia() {
   const hoy = hoyISO(zona, ahora);
   const { inicio, fin } = rangoVista("dia", hoy, zona);
 
-  const [citasHoy, [{ activos }], borradores, avisos] = await Promise.all([
+  const [citasHoy, [{ activos }], [{ totalBorradores }], borradores, avisos] = await Promise.all([
     listarCitasRango(inicio, fin),
     db
       .select({ activos: count() })
       .from(consultantes)
       .where(and(eq(consultantes.psicologoId, user.id), eq(consultantes.estado, "activo"))),
+    db
+      .select({ totalBorradores: count() })
+      .from(notasSesion)
+      .where(and(eq(notasSesion.psicologoId, user.id), eq(notasSesion.estado, "borrador"))),
     db
       .select({
         id: notasSesion.id,
@@ -56,6 +60,7 @@ export async function resumenDelDia() {
     pendientesCitas: vigentes.filter((c) => c.fin > ahora).length,
     activos,
     borradores,
+    totalBorradores,
     recordatorios: avisos.recordatorios,
   };
 }

@@ -30,12 +30,12 @@ export function VistaLista({
       {dias.map((d) => {
         const delDia = citas.filter((c) => formatEnZona(c.inicio, "yyyy-MM-dd", zona) === d);
         return (
-          <li key={d} className="rounded-2xl border bg-card p-4">
+          <li key={d} className="rounded-3xl border bg-card p-4">
             <div className="mb-3 flex items-center justify-between">
               <h3
                 className={cn(
                   "font-heading font-bold",
-                  d === hoy ? "text-lavanda-700" : "text-lavanda-950",
+                  d === hoy ? "text-deep" : "text-ink",
                 )}
               >
                 {mayuscula(formatEnZona(inicioDelDia(d, zona), "EEEE d 'de' MMMM", zona))}
@@ -44,7 +44,7 @@ export function VistaLista({
               <Link
                 href={agendaHref({ vista, fecha, nueva: true, hora: `${d}T09:00` })}
                 scroll={false}
-                className="rounded-lg p-1.5 text-lavanda-600 hover:bg-lavanda-100"
+                className="flex size-9 items-center justify-center rounded-full bg-tint-2 text-deep hover:bg-tint-3"
                 aria-label={`Agendar el ${d}`}
               >
                 <CalendarPlusIcon className="size-5" />
@@ -60,11 +60,11 @@ export function VistaLista({
                       href={agendaHref({ vista, fecha, cita: c.id })}
                       scroll={false}
                       className={cn(
-                        "flex items-center gap-3 rounded-xl border border-lavanda-100 bg-lavanda-50/60 p-3 transition-colors hover:border-lavanda-300",
+                        "flex items-center gap-3 rounded-2xl border bg-tint p-3 transition-colors hover:border-lavanda-300",
                         c.estado === "cancelada" && "opacity-60",
                       )}
                     >
-                      <span className="w-12 shrink-0 font-heading font-bold text-lavanda-800">
+                      <span className="w-12 shrink-0 font-heading font-bold text-deep">
                         {formatEnZona(c.inicio, "HH:mm", zona)}
                       </span>
                       <span className="min-w-0 flex-1">

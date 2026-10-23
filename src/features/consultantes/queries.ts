@@ -1,9 +1,22 @@
 import "server-only";
-import { and, asc, count, eq, getTableColumns, like, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  isNotNull,
+  like,
+  min,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/db";
-import { consultantes } from "@/db/schema";
+import { consultantes, notasSesion } from "@/db/schema";
 import { requireRole } from "@/lib/dal";
 import { likePattern } from "@/lib/validation";
 import { resumenAgenda } from "./resumen-agenda";
@@ -107,4 +120,59 @@ export async function opcionesConsultantes() {
     .from(consultantes)
     .where(and(eq(consultantes.psicologoId, user.id), eq(consultantes.estado, "activo")))
     .orderBy(asc(consultantes.apellidos), asc(consultantes.nombre));
+}
+
+/** Conteos para los filtros de la lista (Todos / En proceso / Alta / Baja). */
+export async function conteosPorEstado() {
+  const user = await requireRole("psicologo");
+  const filas = await db
+    .select({ estado: consultantes.estado, n: count() })
+    .from(consultantes)
+    .where(eq(consultantes.psicologoId, user.id))
+    .groupBy(consultantes.estado);
+  const por = (e: string) => filas.find((f) => f.estado === e)?.n ?? 0;
+  return {
+    activo: por("activo"),
+    alta: por("alta"),
+    baja: por("baja"),
+    todos: filas.reduce((s, f) => s + f.n, 0),
+  };
+}
+
+/** Resumen del proceso terapéutico para la tarjeta "Su proceso" de la ficha. */
+export async function procesoDelConsultante(id: string, desdeRespaldo: Date) {
+  const user = await requireRole("psicologo");
+  const donde = and(eq(notasSesion.consultanteId, id), eq(notasSesion.psicologoId, user.id));
+
+  const [[resumen], recientes, [ultimaTarea]] = await Promise.all([
+    db
+      .select({ sesiones: count(), primera: min(notasSesion.fecha) })
+      .from(notasSesion)
+      .where(donde),
+    db
+      .select({
+        numeroSesion: notasSesion.numeroSesion,
+        estadoAnimo: notasSesion.estadoAnimo,
+      })
+      .from(notasSesion)
+      .where(and(donde, isNotNull(notasSesion.estadoAnimo)))
+      .orderBy(desc(notasSesion.fecha))
+      .limit(8),
+    db
+      .select({ tarea: notasSesion.tareasAsignadas })
+      .from(notasSesion)
+      .where(and(donde, isNotNull(notasSesion.tareasAsignadas), ne(notasSesion.tareasAsignadas, "")))
+      .orderBy(desc(notasSesion.fecha))
+      .limit(1),
+  ]);
+
+  return {
+    sesiones: resumen.sesiones,
+    desde: resumen.primera ? new Date(Number(resumen.primera)) : desdeRespaldo,
+    // De la más antigua a la más reciente, como se dibuja la gráfica.
+    animo: recientes
+      .reverse()
+      .map((n) => ({ numero: n.numeroSesion, valor: n.estadoAnimo as number })),
+    tarea: ultimaTarea?.tarea ?? null,
+  };
 }
