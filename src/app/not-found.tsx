@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function NoEncontrado() {
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center bg-lavanda-50 px-4 text-center">
+    <main className="flex min-h-svh flex-col items-center justify-center bg-sidebar px-4 text-center">
       <Logo className="mb-8" />
       <p className="font-heading text-6xl font-bold text-lavanda-300">404</p>
       <h1 className="mt-2 text-2xl font-bold">Esta página no existe</h1>

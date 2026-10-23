@@ -17,10 +17,10 @@ export function InfoCard({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-2xl border bg-card p-5", className)}>
-      <h2 className="mb-4 flex items-center gap-2 text-base font-bold">
+    <section className={cn("animate-mk-up rounded-3xl border bg-card px-7 py-6", className)}>
+      <h2 className="mb-4 flex items-center gap-2.5 text-[19px] font-bold">
         {Icon && (
-          <span className="flex size-8 items-center justify-center rounded-lg bg-lavanda-100 text-lavanda-700">
+          <span className="flex size-[34px] items-center justify-center rounded-leaf bg-tint-2 text-deep">
             <Icon className="size-4" aria-hidden="true" />
           </span>
         )}
@@ -29,10 +29,10 @@ export function InfoCard({
       <dl className="grid gap-3 sm:grid-cols-2">
         {datos.map(({ label, value }) => (
           <div key={label} className="min-w-0">
-            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            <dt className="text-xs font-extrabold tracking-[0.08em] text-muted-foreground uppercase">
               {label}
             </dt>
-            <dd className="mt-0.5 break-words text-foreground">
+            <dd className="mt-1 font-semibold break-words text-foreground">
               {value === null || value === undefined || value === "" ? (
                 <span className="text-muted-foreground">—</span>
               ) : (

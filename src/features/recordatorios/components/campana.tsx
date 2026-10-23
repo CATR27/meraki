@@ -18,14 +18,14 @@ export function Campana({ citas, recordatorios }: { citas: Aviso[]; recordatorio
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon-lg"
-          className="relative rounded-full"
+          className="relative size-11 rounded-[14px] border-border bg-card text-deep shadow-none hover:bg-tint-2"
           aria-label={total > 0 ? `Avisos: ${total} pendientes` : "Avisos"}
         >
-          <Icono className="size-5 text-lavanda-700" />
+          <Icono className="size-[19px]" />
           {total > 0 && (
-            <span className="absolute top-1 right-1 flex min-w-4.5 items-center justify-center rounded-full bg-destructive px-1 text-[0.65rem] leading-4.5 font-bold text-white">
+            <span className="absolute -top-1 -right-1 flex min-w-4.5 items-center justify-center rounded-full border-2 border-card bg-destructive px-1 text-[0.65rem] leading-4 font-bold text-white">
               {total > 9 ? "9+" : total}
             </span>
           )}
@@ -89,7 +89,7 @@ function Grupo({
             <Link
               href={a.href}
               onClick={cerrar}
-              className="block rounded-lg px-2 py-2 transition-colors hover:bg-lavanda-50"
+              className="block rounded-xl px-2 py-2 transition-colors hover:bg-tint"
             >
               <span className="block truncate text-sm font-semibold">{a.titulo}</span>
               <span

@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Cambiar contraseña" };
 
 export default function CambiarContrasenaPage() {
   return (
-    <section className="rounded-3xl border border-lavanda-100 bg-card p-8 shadow-xl shadow-lavanda-200/40 sm:p-10">
+    <section className="animate-mk-up rounded-3xl border border-border bg-card p-8 shadow-[0_30px_60px_-40px_rgba(58,31,97,0.45)] sm:p-10">
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Contenido />
       </Suspense>
@@ -21,7 +21,7 @@ async function Contenido() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-[32px] font-bold tracking-[-0.02em]">
         {user.mustChangePassword ? "Crea tu contraseña" : "Cambiar contraseña"}
       </h1>
       <p className="mt-2 mb-8 text-muted-foreground">

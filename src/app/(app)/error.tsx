@@ -11,8 +11,8 @@ export default function ErrorApp({ error, retry }: { error: unknown; retry: () =
   }, [error]);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center py-16 text-center">
-      <span className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-warning-soft text-warning">
+    <div className="mx-auto flex max-w-md animate-mk-up flex-col items-center py-16 text-center">
+      <span className="mb-5 flex size-14 items-center justify-center rounded-leaf bg-warning-soft text-warning">
         <TriangleAlertIcon className="size-7" aria-hidden="true" />
       </span>
       <h1 className="text-2xl font-bold">Algo no salió como esperábamos</h1>

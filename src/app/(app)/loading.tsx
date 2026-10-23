@@ -8,11 +8,11 @@ export default function Loading() {
         <Skeleton className="h-5 w-96 max-w-full" />
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        <Skeleton className="h-32 rounded-2xl" />
-        <Skeleton className="h-32 rounded-2xl" />
-        <Skeleton className="h-32 rounded-2xl" />
+        <Skeleton className="h-32 rounded-3xl" />
+        <Skeleton className="h-32 rounded-3xl" />
+        <Skeleton className="h-32 rounded-3xl" />
       </div>
-      <Skeleton className="h-72 rounded-2xl" />
+      <Skeleton className="h-72 rounded-3xl" />
     </div>
   );
 }

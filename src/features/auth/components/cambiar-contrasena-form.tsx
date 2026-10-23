@@ -18,7 +18,7 @@ export function CambiarContrasenaForm({ temporal }: { temporal: boolean }) {
         label={temporal ? "Contraseña temporal" : "Contraseña actual"}
         error={state?.fieldErrors?.actual}
       >
-        <PasswordInput name="actual" autoComplete="current-password" required className="h-11" />
+        <PasswordInput name="actual" autoComplete="current-password" required className="h-12" />
       </Field>
       <Field
         id="nueva"
@@ -26,16 +26,16 @@ export function CambiarContrasenaForm({ temporal }: { temporal: boolean }) {
         hint="Mínimo 8 caracteres, con al menos una letra y un número."
         error={state?.fieldErrors?.nueva}
       >
-        <PasswordInput name="nueva" autoComplete="new-password" required className="h-11" />
+        <PasswordInput name="nueva" autoComplete="new-password" required className="h-12" />
       </Field>
       <Field
         id="confirmar"
         label="Confirma la nueva contraseña"
         error={state?.fieldErrors?.confirmar}
       >
-        <PasswordInput name="confirmar" autoComplete="new-password" required className="h-11" />
+        <PasswordInput name="confirmar" autoComplete="new-password" required className="h-12" />
       </Field>
-      <SubmitButton size="lg" className="mt-1 h-11 text-base" pendingText="Guardando…">
+      <SubmitButton size="lg" className="mt-2 h-[52px] text-base font-extrabold" pendingText="Guardando…">
         Guardar contraseña
       </SubmitButton>
     </form>
