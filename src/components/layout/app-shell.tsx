@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CampanaServidor } from "@/features/recordatorios/components/campana-servidor";
 import { requireUser } from "@/lib/dal";
 import { ROL_LABEL } from "@/lib/format";
 import { MobileNav } from "./mobile-nav";
@@ -45,6 +46,11 @@ async function HeaderForUser() {
       <MobileNav role={user.role} />
       <Logo className="lg:hidden [&_span:last-child]:text-xl [&_svg]:size-7" />
       <div className="ml-auto flex items-center gap-2">
+        {user.role === "psicologo" && (
+          <Suspense fallback={<Skeleton className="size-10 rounded-full" />}>
+            <CampanaServidor />
+          </Suspense>
+        )}
         <UserMenu name={user.name} email={user.email} roleLabel={ROL_LABEL[user.role]} />
       </div>
     </>

@@ -36,3 +36,21 @@ export function edad(fechaNacimiento: string, hoy: string = hoyISO()): number {
   if (hm < nm || (hm === nm && hd < nd)) anios--;
   return anios;
 }
+
+/** "Hoy, 18:00", "Mañana, 09:00", "Ayer, 10:00" o "vie 23 oct, 10:00". */
+export function cuandoRelativo(date: Date | number, zona: string = DEFAULT_TZ, ahora = new Date()) {
+  const dia = formatEnZona(date, "yyyy-MM-dd", zona);
+  const hora = formatEnZona(date, "HH:mm", zona);
+  const hoy = hoyISO(zona, ahora);
+  const desplazar = (dias: number) => hoyISO(zona, new Date(ahora.getTime() + dias * 86_400_000));
+  if (dia === hoy) return `Hoy, ${hora}`;
+  if (dia === desplazar(1)) return `Mañana, ${hora}`;
+  if (dia === desplazar(-1)) return `Ayer, ${hora}`;
+  return formatEnZona(date, "EEE d MMM, HH:mm", zona);
+}
+
+/** Siguiente hora en punto (HH:00) en la zona indicada; útil como valor por defecto. */
+export function siguienteHora(zona: string = DEFAULT_TZ, ahora: Date = new Date()) {
+  const h = (Number(formatEnZona(ahora, "H", zona)) + 1) % 24;
+  return `${String(h).padStart(2, "0")}:00`;
+}
