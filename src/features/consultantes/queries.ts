@@ -113,7 +113,12 @@ export type Consultante = Awaited<ReturnType<typeof obtenerConsultante>>;
 export async function opcionesConsultantes() {
   const user = await requireRole("psicologo");
   return db
-    .select({ id: consultantes.id, nombre: consultantes.nombre, apellidos: consultantes.apellidos })
+    .select({
+      id: consultantes.id,
+      nombre: consultantes.nombre,
+      apellidos: consultantes.apellidos,
+      tieneEmail: sql<boolean>`${consultantes.email} is not null`.mapWith(Boolean),
+    })
     .from(consultantes)
     .where(and(eq(consultantes.psicologoId, user.id), eq(consultantes.estado, "activo")))
     .orderBy(asc(consultantes.apellidos), asc(consultantes.nombre));

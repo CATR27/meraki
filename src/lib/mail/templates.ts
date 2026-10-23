@@ -114,3 +114,50 @@ Contraseña temporal: ${p.contrasenaTemporal}
 Ingresa aquí: ${p.loginUrl}`;
   return { subject, html, text };
 }
+
+export function correoConfirmacionCita(p: {
+  consultante: string;
+  psicologo: string;
+  fecha: string;
+  hora: string;
+  duracionMin: number;
+  modalidad: "presencial" | "en_linea";
+  direccion?: string | null;
+  enlace?: string | null;
+  telefonoPsicologo?: string | null;
+  reprogramada?: boolean;
+}): EmailContent {
+  const lugar =
+    p.modalidad === "en_linea"
+      ? "En línea (videollamada)"
+      : (p.direccion ?? "Consultorio (presencial)");
+  const subject = p.reprogramada
+    ? `Tu cita se reprogramó: ${p.fecha}, ${p.hora}`
+    : `Cita confirmada: ${p.fecha}, ${p.hora}`;
+  const filas: [string, string][] = [
+    ["Fecha", p.fecha],
+    ["Hora", `${p.hora} (${p.duracionMin} min)`],
+    ["Con", p.psicologo],
+    ["Modalidad", lugar],
+  ];
+  const html = layout({
+    preheader: `${p.fecha} a las ${p.hora} con ${p.psicologo}.`,
+    body: `
+<h1 style="margin:0 0 12px;font-size:22px;">Hola, ${esc(p.consultante)}</h1>
+<p style="margin:0 0 8px;">${p.reprogramada ? "Tu cita fue <strong>reprogramada</strong>. Estos son los nuevos datos:" : "Tu cita quedó <strong>agendada</strong>. Te esperamos:"}</p>
+${detalle(filas)}
+${p.modalidad === "en_linea" && p.enlace ? `<p style="margin:0 0 24px;">${boton(p.enlace, "Entrar a la videollamada")}</p>` : ""}
+<p style="margin:0 0 8px;">Adjuntamos un archivo para agregar la cita a tu calendario.</p>
+<p style="margin:0;color:${C.suave};font-size:14px;">Si necesitas cambiarla o cancelarla, comunícate con tu psicólogo/a${p.telefonoPsicologo ? ` al ${esc(p.telefonoPsicologo)}` : ""} con anticipación.</p>`,
+  });
+  const text = `Hola, ${p.consultante}
+
+${p.reprogramada ? "Tu cita fue reprogramada." : "Tu cita quedó agendada."}
+Fecha: ${p.fecha}
+Hora: ${p.hora} (${p.duracionMin} min)
+Con: ${p.psicologo}
+Modalidad: ${lugar}${p.modalidad === "en_linea" && p.enlace ? `\nEnlace: ${p.enlace}` : ""}
+
+Si necesitas cambiarla o cancelarla, comunícate con tu psicólogo/a${p.telefonoPsicologo ? ` al ${p.telefonoPsicologo}` : ""}.`;
+  return { subject, html, text };
+}
