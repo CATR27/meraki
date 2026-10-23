@@ -14,3 +14,8 @@ export function iniciales(nombre: string): string {
 export function nombreCompleto(p: { nombre: string; apellidos: string }): string {
   return `${p.nombre} ${p.apellidos}`.trim();
 }
+
+/** Primera letra en mayúscula ("jueves 22 de octubre" → "Jueves 22 de octubre"). */
+export function mayuscula(texto: string): string {
+  return texto.charAt(0).toLocaleUpperCase("es") + texto.slice(1);
+}

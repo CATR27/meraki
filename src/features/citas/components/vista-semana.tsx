@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HORA_FIN, HORA_INICIO, inicioDelDia, posicionEnDia, type Vista } from "@/lib/agenda";
 import { formatEnZona } from "@/lib/dates";
 import { cn } from "@/lib/utils";
+import { ScrollAHora } from "./scroll-a-hora";
 import { ESTADO_CITA_BLOQUE } from "../constantes";
 import type { CitaAgenda } from "../queries";
 import { agendaHref } from "../urls";
@@ -33,13 +34,21 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
   }
   const ahoraPos = posicionEnDia(ahora, ahora, zona).top;
 
+  // Al abrir, muestra desde una hora antes de "ahora" si hoy está visible; si no, desde las 8:00.
+  const horaAncla = dias.includes(hoy)
+    ? Math.floor((ahoraPos / 100) * HORAS.length) - 1
+    : 8 - HORA_INICIO;
+
   return (
     <div className="overflow-hidden rounded-2xl border bg-card">
-      <div className="overflow-x-auto">
+      <ScrollAHora
+        offsetPx={horaAncla * ALTO_HORA}
+        className="max-h-[calc(100svh-15rem)] min-h-96 overflow-auto overscroll-contain"
+      >
         <div className={cn(vista === "semana" && "min-w-[46rem]")}>
           {/* Encabezado de días */}
           <div
-            className="sticky top-0 z-10 grid border-b bg-lavanda-50/80 backdrop-blur"
+            className="sticky top-0 z-30 grid border-b bg-lavanda-50/90 backdrop-blur"
             style={{ gridTemplateColumns: `4rem repeat(${dias.length}, minmax(0, 1fr))` }}
           >
             <div />
@@ -149,7 +158,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
             ))}
           </div>
         </div>
-      </div>
+      </ScrollAHora>
     </div>
   );
 }

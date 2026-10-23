@@ -30,6 +30,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import type { ActionState } from "@/lib/action-state";
 import { formatEnZona } from "@/lib/dates";
+import { mayuscula } from "@/lib/format";
 import { cambiarEstadoCita, reenviarConfirmacion } from "../actions";
 import {
   ESTADO_CITA_LABEL,
@@ -81,10 +82,9 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
             </StatusBadge>
           </div>
           <DialogTitle className="font-heading text-2xl">{nombre}</DialogTitle>
-          <DialogDescription className="flex items-center gap-2 text-base capitalize">
+          <DialogDescription className="flex items-center gap-2 text-base">
             <CalendarClockIcon className="size-4 text-lavanda-600" aria-hidden="true" />
-            {formatEnZona(cita.inicio, "EEEE d 'de' MMMM, HH:mm", zona)} ·{" "}
-            <span className="normal-case">{duracion} min</span>
+            {mayuscula(formatEnZona(cita.inicio, "EEEE d 'de' MMMM, HH:mm", zona))} · {duracion} min
           </DialogDescription>
         </DialogHeader>
 

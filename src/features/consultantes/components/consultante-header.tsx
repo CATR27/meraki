@@ -41,7 +41,7 @@ export async function ConsultanteHeader({ id }: { id: string }) {
                 </StatusBadge>
               )}
               {c.proximaCita && (
-                <span className="capitalize">
+                <span>
                   Próxima cita: {formatEnZona(c.proximaCita, "EEE d MMM, HH:mm", user.zonaHoraria)}
                 </span>
               )}

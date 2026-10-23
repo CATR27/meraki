@@ -3,6 +3,7 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { inicioDelDia, type Vista } from "@/lib/agenda";
 import { formatEnZona } from "@/lib/dates";
+import { mayuscula } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { ESTADO_CITA_LABEL, ESTADO_CITA_TONO } from "../constantes";
 import type { CitaAgenda } from "../queries";
@@ -33,11 +34,11 @@ export function VistaLista({
             <div className="mb-3 flex items-center justify-between">
               <h3
                 className={cn(
-                  "font-heading font-bold capitalize",
+                  "font-heading font-bold",
                   d === hoy ? "text-lavanda-700" : "text-lavanda-950",
                 )}
               >
-                {formatEnZona(inicioDelDia(d, zona), "EEEE d 'de' MMMM", zona)}
+                {mayuscula(formatEnZona(inicioDelDia(d, zona), "EEEE d 'de' MMMM", zona))}
                 {d === hoy && " · Hoy"}
               </h3>
               <Link

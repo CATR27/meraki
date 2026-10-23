@@ -10,6 +10,7 @@ import { agendaHref } from "@/features/citas/urls";
 import { aLocal } from "@/lib/agenda";
 import { requireRole } from "@/lib/dal";
 import { formatEnZona } from "@/lib/dates";
+import { mayuscula } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Citas del consultante" };
 
@@ -67,10 +68,10 @@ function ListaCitas({
           <li key={c.id} className="flex flex-wrap items-center gap-3 px-5 py-3.5">
             <Link
               href={agendaHref({ vista: "dia", fecha: aLocal(c.inicio, zona).fecha, cita: c.id })}
-              className="min-w-0 flex-1 font-semibold capitalize hover:text-lavanda-700"
+              className="min-w-0 flex-1 font-semibold hover:text-lavanda-700"
             >
-              {formatEnZona(c.inicio, "EEEE d 'de' MMMM yyyy · HH:mm", zona)}
-              <span className="ml-2 text-sm font-normal text-muted-foreground normal-case">
+              {mayuscula(formatEnZona(c.inicio, "EEEE d 'de' MMMM yyyy · HH:mm", zona))}
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
                 {MODALIDAD_LABEL[c.modalidad]}
               </span>
             </Link>

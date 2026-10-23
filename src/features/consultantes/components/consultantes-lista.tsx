@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { edad, formatEnZona, formatFecha } from "@/lib/dates";
-import { iniciales, nombreCompleto } from "@/lib/format";
+import { iniciales, mayuscula, nombreCompleto } from "@/lib/format";
 import type { ConsultanteListado } from "../queries";
 import { EstadoConsultanteBadge } from "./estado-badge";
 
@@ -51,7 +51,7 @@ function SinConsentimiento() {
 export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
   const proxima = (d: Date | null) =>
     d ? (
-      formatEnZona(d, "EEE d MMM · HH:mm", zona)
+      mayuscula(formatEnZona(d, "EEE d MMM · HH:mm", zona))
     ) : (
       <span className="text-muted-foreground">—</span>
     );
@@ -89,7 +89,7 @@ export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
                     {!c.consentimientoInformado && <SinConsentimiento />}
                   </div>
                 </TableCell>
-                <TableCell className="text-sm capitalize">{proxima(c.proximaCita)}</TableCell>
+                <TableCell className="text-sm">{proxima(c.proximaCita)}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {c.ultimaSesion ? formatFecha(c.ultimaSesion, zona) : "—"}
                 </TableCell>
@@ -114,9 +114,9 @@ export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
                 <EstadoConsultanteBadge estado={c.estado} />
                 {!c.consentimientoInformado && <SinConsentimiento />}
                 {c.proximaCita && (
-                  <span className="inline-flex items-center gap-1 text-muted-foreground capitalize">
+                  <span className="inline-flex items-center gap-1 text-muted-foreground">
                     <CalendarClockIcon className="size-3.5" aria-hidden="true" />
-                    {formatEnZona(c.proximaCita, "EEE d MMM · HH:mm", zona)}
+                    {proxima(c.proximaCita)}
                   </span>
                 )}
               </div>

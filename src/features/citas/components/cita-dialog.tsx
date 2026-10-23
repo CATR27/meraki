@@ -73,6 +73,7 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
   const [modalidad, setModalidad] = useState<Modalidad>(
     (v("modalidad") as Modalidad) || "presencial",
   );
+  const [enviar, setEnviar] = useState(!citaId);
   const seleccionado = consultantes.find((c) => c.id === consultanteId);
   const puedeEnviar = Boolean(seleccionado?.tieneEmail);
 
@@ -206,7 +207,8 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
                 id="enviarConfirmacion"
                 name="enviarConfirmacion"
                 value="on"
-                defaultChecked={!citaId}
+                checked={puedeEnviar && enviar}
+                onCheckedChange={(c) => setEnviar(c === true)}
                 disabled={!puedeEnviar}
                 className="mt-0.5"
               />

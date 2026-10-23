@@ -2,6 +2,7 @@ import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { navegar, tituloVista, type Vista, VISTAS } from "@/lib/agenda";
+import { mayuscula } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { agendaHref } from "../urls";
 
@@ -32,8 +33,8 @@ export function AgendaToolbar({ vista, fecha, hoy }: { vista: Vista; fecha: stri
             </Link>
           </Button>
         </div>
-        <h2 className="font-heading text-xl font-bold capitalize sm:text-2xl" aria-live="polite">
-          {tituloVista(vista, fecha)}
+        <h2 className="font-heading text-xl font-bold sm:text-2xl" aria-live="polite">
+          {mayuscula(tituloVista(vista, fecha))}
         </h2>
       </div>
 
