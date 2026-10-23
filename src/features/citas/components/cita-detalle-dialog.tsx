@@ -94,7 +94,7 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
               href={cita.enlaceVideollamada}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 font-semibold break-all text-lavanda-700 hover:underline"
+              className="inline-flex items-center gap-2 font-semibold break-all text-deep hover:underline"
             >
               <VideoIcon className="size-4 shrink-0" aria-hidden="true" /> Abrir videollamada
             </a>

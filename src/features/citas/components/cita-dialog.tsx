@@ -142,7 +142,7 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
             </div>
 
             <fieldset className="grid gap-2">
-              <legend className="mb-2 text-sm font-semibold text-lavanda-950">Modalidad</legend>
+              <legend className="mb-2 text-sm font-semibold text-ink">Modalidad</legend>
               <div className="grid grid-cols-2 gap-3">
                 {MODALIDADES.map((m) => {
                   const Icon = m === "presencial" ? MapPinIcon : VideoIcon;
@@ -152,7 +152,7 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
                       className={cn(
                         "flex cursor-pointer items-center gap-2.5 rounded-xl border p-3 text-sm font-semibold transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
                         modalidad === m
-                          ? "border-lavanda-500 bg-lavanda-50 text-lavanda-800"
+                          ? "border-lavanda-500 bg-tint text-soft-foreground"
                           : "hover:border-lavanda-300",
                       )}
                     >
@@ -202,7 +202,7 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
               />
             </Field>
 
-            <div className="flex items-start gap-3 rounded-xl bg-lavanda-50 p-3">
+            <div className="flex items-start gap-3 rounded-xl bg-tint p-3">
               <Checkbox
                 id="enviarConfirmacion"
                 name="enviarConfirmacion"

@@ -165,7 +165,7 @@ export function ConsultanteForm({
                 </NativeSelect>
               </Field>
             )}
-            <div className="flex items-start gap-3 rounded-xl border border-lavanda-200 bg-lavanda-50/70 p-4 sm:col-span-2">
+            <div className="flex items-start gap-3 rounded-xl border border-tint-3 bg-tint p-4 sm:col-span-2">
               <Checkbox
                 id="consentimientoInformado"
                 name="consentimientoInformado"

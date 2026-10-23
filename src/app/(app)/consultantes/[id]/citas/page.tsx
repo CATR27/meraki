@@ -63,12 +63,12 @@ function ListaCitas({
   return (
     <section>
       <h2 className="mb-3 text-lg font-bold">{titulo}</h2>
-      <ul className="divide-y overflow-hidden rounded-2xl border bg-card">
+      <ul className="divide-y overflow-hidden rounded-3xl border bg-card">
         {items.map((c) => (
           <li key={c.id} className="flex flex-wrap items-center gap-3 px-5 py-3.5">
             <Link
               href={agendaHref({ vista: "dia", fecha: aLocal(c.inicio, zona).fecha, cita: c.id })}
-              className="min-w-0 flex-1 font-semibold hover:text-lavanda-700"
+              className="min-w-0 flex-1 font-semibold hover:text-deep"
             >
               {mayuscula(formatEnZona(c.inicio, "EEEE d 'de' MMMM yyyy · HH:mm", zona))}
               <span className="ml-2 text-sm font-normal text-muted-foreground">

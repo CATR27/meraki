@@ -40,17 +40,17 @@ export default async function SesionesPage({ params }: PageProps<"/consultantes/
   return (
     <div className="grid gap-6">
       {conAnimo.length >= 2 && <EvolucionAnimo notas={conAnimo} />}
-      <ol className="relative grid gap-4 border-l-2 border-lavanda-200 pl-6">
+      <ol className="relative grid gap-4 border-l-2 border-tint-3 pl-6">
         {notas.map((n) => (
           <li key={n.id} className="relative">
             <span
               aria-hidden="true"
               className={cn(
-                "absolute top-5 -left-[33px] size-4 rounded-full border-4 border-background",
+                "absolute top-5 -left-[33px] size-4 rounded-leaf border-4 border-background",
                 n.estado === "cerrada" ? "bg-lavanda-600" : "bg-warning",
               )}
             />
-            <article className="rounded-2xl border bg-card p-5">
+            <article className="rounded-3xl border bg-card p-5">
               <header className="mb-2 flex flex-wrap items-center gap-2">
                 <h2 className="text-base font-bold">Sesión {n.numeroSesion}</h2>
                 <span className="text-sm text-muted-foreground">
@@ -100,11 +100,11 @@ function EvolucionAnimo({ notas }: { notas: NotaResumen[] }) {
   const primero = notas[0].estadoAnimo!;
 
   return (
-    <section className="rounded-2xl border bg-card p-5">
+    <section className="rounded-3xl border bg-card p-5">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-base font-bold">Evolución del estado de ánimo</h2>
         <p className="text-sm text-muted-foreground">
-          De {primero}/10 a <span className="font-bold text-lavanda-800">{ultimo}/10</span> en{" "}
+          De {primero}/10 a <span className="font-bold text-soft-foreground">{ultimo}/10</span> en{" "}
           {notas.length} sesiones
         </p>
       </div>
@@ -122,7 +122,7 @@ function EvolucionAnimo({ notas }: { notas: NotaResumen[] }) {
             x2={ancho - pad}
             y1={y(v)}
             y2={y(v)}
-            className="stroke-lavanda-100"
+            className="stroke-tint-2"
             strokeWidth="1"
           />
         ))}
@@ -136,7 +136,7 @@ function EvolucionAnimo({ notas }: { notas: NotaResumen[] }) {
           vectorEffect="non-scaling-stroke"
         />
         {notas.map((n, i) => (
-          <circle key={n.id} cx={x(i)} cy={y(n.estadoAnimo!)} r="5" className="fill-lavanda-700" />
+          <circle key={n.id} cx={x(i)} cy={y(n.estadoAnimo!)} r="5" className="fill-primary" />
         ))}
       </svg>
     </section>

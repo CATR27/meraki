@@ -32,7 +32,7 @@ export function Logo({
       <span
         className={cn(
           "font-heading text-2xl font-bold tracking-tight",
-          variant === "light" ? "text-white" : "text-lavanda-800",
+          variant === "light" ? "text-white" : "text-lavanda-800 dark:text-lavanda-100",
         )}
       >
         Meraki

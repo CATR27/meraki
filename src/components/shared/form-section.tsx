@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** Bloque de formulario: título y descripción a la izquierda, campos a la derecha. */
+/** Bloque de formulario en tarjeta: título y descripción arriba, campos en dos columnas. */
 export function FormSection({
   title,
   description,
@@ -16,15 +16,15 @@ export function FormSection({
   return (
     <section
       className={cn(
-        "grid gap-6 border-b border-border/70 py-8 first:pt-0 last:border-b-0 lg:grid-cols-[16rem_1fr]",
+        "animate-mk-up mb-6 grid gap-5 rounded-3xl border bg-card px-6 py-6 sm:px-7",
         className,
       )}
     >
       <div>
-        <h2 className="text-lg font-bold">{title}</h2>
+        <h2 className="text-xl font-bold">{title}</h2>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
-      <div className="grid gap-5 sm:grid-cols-2">{children}</div>
+      <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">{children}</div>
     </section>
   );
 }

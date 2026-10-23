@@ -6,15 +6,14 @@ import { CAMPOS_SOAP, RIESGO_LABEL } from "../schemas";
 
 /** Nota cerrada: solo lectura, para preservar la integridad del registro clínico. */
 export function NotaLectura({ nota, zona }: { nota: NonNullable<Sesion["nota"]>; zona: string }) {
-  const bloques = [
-    ...CAMPOS_SOAP.map((c) => ({ label: c.label, valor: nota[c.campo] })),
+  const extras = [
     { label: "Tareas asignadas", valor: nota.tareasAsignadas },
     { label: "Observaciones", valor: nota.observaciones },
   ];
 
   return (
-    <article className="grid gap-5 rounded-2xl border bg-card p-5 sm:p-6">
-      <header className="flex flex-wrap items-center gap-2">
+    <div className="grid gap-4">
+      <div className="flex flex-wrap items-center gap-2">
         <StatusBadge tono="success">
           <LockKeyholeIcon className="size-3" aria-hidden="true" /> Nota cerrada
         </StatusBadge>
@@ -37,15 +36,41 @@ export function NotaLectura({ nota, zona }: { nota: NonNullable<Sesion["nota"]>;
             ? RIESGO_LABEL.ninguno
             : `Riesgo ${RIESGO_LABEL[nota.nivelRiesgo].toLowerCase()}`}
         </StatusBadge>
-      </header>
-      {bloques.map(({ label, valor }) => (
-        <section key={label}>
-          <h2 className="text-sm font-bold text-lavanda-900">{label}</h2>
-          <p className="mt-1 leading-relaxed whitespace-pre-line">
-            {valor || <span className="text-muted-foreground">Sin registro</span>}
-          </p>
-        </section>
-      ))}
-    </article>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {CAMPOS_SOAP.map(({ campo, label, guia }, i) => (
+          <section
+            key={campo}
+            style={{ animationDelay: `${100 + i * 70}ms` }}
+            className="animate-mk-up grid content-start gap-2 rounded-3xl border bg-card px-[22px] py-5"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex size-[42px] shrink-0 items-center justify-center rounded-leaf bg-primary font-heading text-xl font-bold text-primary-foreground">
+                {label.charAt(0)}
+              </span>
+              <span className="grid">
+                <h2 className="font-sans text-base font-extrabold tracking-normal">{label}</h2>
+                <span className="text-xs leading-snug text-muted-foreground">{guia}</span>
+              </span>
+            </div>
+            <p className="mt-1 text-sm leading-relaxed whitespace-pre-line">
+              {nota[campo] || <span className="text-muted-foreground">Sin registro</span>}
+            </p>
+          </section>
+        ))}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {extras.map(({ label, valor }) => (
+          <section key={label} className="rounded-3xl border bg-card px-[22px] py-5">
+            <h2 className="font-sans text-sm font-extrabold tracking-normal">{label}</h2>
+            <p className="mt-1 text-sm leading-relaxed whitespace-pre-line">
+              {valor || <span className="text-muted-foreground">Sin registro</span>}
+            </p>
+          </section>
+        ))}
+      </div>
+    </div>
   );
 }

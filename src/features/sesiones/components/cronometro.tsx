@@ -1,8 +1,9 @@
 "use client";
 
-import { TimerIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+
+const CIRCUNFERENCIA = 113.1; // 2·π·18
 
 function leerInicio(clave: string): number {
   try {
@@ -16,7 +17,7 @@ function leerInicio(clave: string): number {
   }
 }
 
-/** Tiempo transcurrido de la sesión; sobrevive a recargas de la pestaña. */
+/** Tiempo transcurrido de la sesión en un anillo; sobrevive a recargas de la pestaña. */
 export function Cronometro({ citaId, duracionMin }: { citaId: string; duracionMin: number }) {
   const [transcurrido, setTranscurrido] = useState<number | null>(null);
 
@@ -32,18 +33,40 @@ export function Cronometro({ citaId, duracionMin }: { citaId: string; duracionMi
   const excedido = seg > duracionMin * 60;
   const mm = String(Math.floor(seg / 60)).padStart(2, "0");
   const ss = String(seg % 60).padStart(2, "0");
+  const restante = CIRCUNFERENCIA * (1 - Math.min(seg / (duracionMin * 60), 1));
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-sm font-bold tabular-nums",
-        excedido ? "bg-warning-soft text-warning" : "bg-lavanda-100 text-lavanda-800",
-      )}
+    <div
+      className="flex items-center gap-3 rounded-full bg-tint py-1.5 pr-[18px] pl-1.5"
       title={`Duración planeada: ${duracionMin} min`}
     >
-      <TimerIcon className="size-4" aria-hidden="true" />
-      <span aria-label="Tiempo de sesión">{transcurrido === null ? "--:--" : `${mm}:${ss}`}</span>
-      <span className="font-sans font-semibold opacity-70">/ {duracionMin} min</span>
-    </span>
+      <svg viewBox="0 0 44 44" aria-hidden="true" className="size-11 -rotate-90">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--tint-3)" strokeWidth="4" />
+        <circle
+          cx="22"
+          cy="22"
+          r="18"
+          fill="none"
+          stroke={excedido ? "var(--warning)" : "var(--primary)"}
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={CIRCUNFERENCIA}
+          strokeDashoffset={restante}
+          style={{ transition: "stroke-dashoffset 1s linear" }}
+        />
+      </svg>
+      <span className="grid leading-[1.1]">
+        <span
+          aria-label="Tiempo de sesión"
+          className={cn(
+            "font-heading text-2xl font-bold tabular-nums",
+            excedido ? "text-warning" : "text-ink",
+          )}
+        >
+          {transcurrido === null ? "--:--" : `${mm}:${ss}`}
+        </span>
+        <span className="text-xs text-muted-foreground">de {duracionMin} min</span>
+      </span>
+    </div>
   );
 }

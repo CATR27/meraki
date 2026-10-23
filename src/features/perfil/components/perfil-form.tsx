@@ -40,8 +40,10 @@ export function PerfilForm({ rol, defaults }: { rol: Rol; defaults: Valores }) {
         />
       )}
 
-      <div className="flex justify-end border-t border-border/70 pt-6">
-        <SubmitButton pendingText="Guardando…">Guardar cambios</SubmitButton>
+      <div className="mb-6 flex justify-end">
+        <SubmitButton pendingText="Guardando…" size="lg">
+          Guardar cambios
+        </SubmitButton>
       </div>
     </form>
   );

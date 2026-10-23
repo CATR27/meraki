@@ -1,5 +1,5 @@
 import { StatusBadge } from "@/components/shared/status-badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PersonAvatar } from "@/components/shared/person-avatar";
 import {
   Table,
   TableBody,
@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatFecha } from "@/lib/dates";
-import { iniciales } from "@/lib/format";
 import type { PsicologoListado } from "../queries";
 import { PsicologoAcciones } from "./psicologo-acciones";
 
@@ -22,13 +21,9 @@ function Estado({ p }: { p: PsicologoListado }) {
 function Persona({ p }: { p: PsicologoListado }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <Avatar className="size-10">
-        <AvatarFallback className="bg-lavanda-100 font-heading font-bold text-lavanda-700">
-          {iniciales(p.name)}
-        </AvatarFallback>
-      </Avatar>
+      <PersonAvatar nombre={p.name} className="size-[42px] text-sm" />
       <div className="min-w-0">
-        <p className="truncate font-bold text-lavanda-950">{p.name}</p>
+        <p className="truncate font-extrabold text-ink">{p.name}</p>
         <p className="truncate text-sm text-muted-foreground">{p.email}</p>
       </div>
     </div>
@@ -39,9 +34,9 @@ export function PsicologosTabla({ psicologos }: { psicologos: PsicologoListado[]
   return (
     <>
       {/* Escritorio */}
-      <div className="hidden overflow-hidden rounded-2xl border bg-card md:block">
+      <div className="animate-mk-up hidden overflow-hidden rounded-3xl border bg-card [animation-delay:240ms] md:block">
         <Table>
-          <TableHeader className="bg-lavanda-50/70">
+          <TableHeader className="bg-tint">
             <TableRow>
               <TableHead className="pl-5">Psicólogo/a</TableHead>
               <TableHead>Cédula</TableHead>
@@ -79,7 +74,7 @@ export function PsicologosTabla({ psicologos }: { psicologos: PsicologoListado[]
       {/* Móvil */}
       <ul className="grid gap-3 md:hidden">
         {psicologos.map((p) => (
-          <li key={p.id} className="rounded-2xl border bg-card p-4">
+          <li key={p.id} className="rounded-3xl border bg-card p-4">
             <div className="flex items-start justify-between gap-2">
               <Persona p={p} />
               <PsicologoAcciones id={p.id} nombre={p.name} suspendido={Boolean(p.banned)} />

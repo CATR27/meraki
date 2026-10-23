@@ -29,10 +29,10 @@ export function Field({ id, label, error, hint, required, className, children }:
 
   return (
     <div className={cn("grid content-start gap-2", className)}>
-      <Label htmlFor={id} className="text-sm font-semibold text-lavanda-950">
+      <Label htmlFor={id} className="text-sm font-extrabold text-ink">
         {label}
         {required && (
-          <span aria-hidden="true" className="text-lavanda-600">
+          <span aria-hidden="true" className="text-lavanda-500">
             *
           </span>
         )}

@@ -24,7 +24,7 @@ export function ExpedienteSheet({
     <Sheet>
       <SheetTrigger asChild>
         <Button variant="outline">
-          <NotebookPenIcon /> Actualizar expediente
+          <NotebookPenIcon /> Expediente
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full overflow-y-auto bg-background sm:max-w-2xl">

@@ -41,7 +41,7 @@ function Formulario({
   const v = (campo: string, def = "") => state?.values?.[campo] ?? def;
 
   return (
-    <form action={formAction} noValidate className="grid gap-4">
+    <form action={formAction} noValidate className="relative grid gap-4">
       <Field id="titulo" label="¿Qué necesitas recordar?" required error={err?.titulo}>
         <Input
           name="titulo"
@@ -71,8 +71,8 @@ function Formulario({
       <Field id="descripcion" label="Detalles (opcional)" error={err?.descripcion}>
         <Textarea name="descripcion" defaultValue={v("descripcion")} className="min-h-20" />
       </Field>
-      <SubmitButton pendingText="Guardando…">
-        <PlusIcon /> Agregar recordatorio
+      <SubmitButton pendingText="Guardando…" size="lg" className="w-full font-extrabold">
+        <PlusIcon /> Guardar recordatorio
       </SubmitButton>
     </form>
   );

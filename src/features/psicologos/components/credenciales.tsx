@@ -6,10 +6,10 @@ import type { Credenciales as CredencialesData } from "../actions";
 export function Credenciales({ data }: { data: CredencialesData }) {
   return (
     <div className="grid gap-4">
-      <div className="rounded-2xl border border-lavanda-200 bg-lavanda-50 p-4">
-        <p className="text-sm font-semibold text-lavanda-900">Contraseña temporal</p>
+      <div className="rounded-2xl border border-tint-3 bg-tint p-4">
+        <p className="text-sm font-semibold text-ink">Contraseña temporal</p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <code className="rounded-lg bg-card px-3 py-1.5 font-mono text-lg font-bold tracking-wider text-lavanda-800 ring-1 ring-lavanda-200">
+          <code className="rounded-lg bg-card px-3 py-1.5 font-mono text-lg font-bold tracking-wider text-soft-foreground ring-1 ring-tint-3">
             {data.contrasenaTemporal}
           </code>
           <CopyButton value={data.contrasenaTemporal} />
