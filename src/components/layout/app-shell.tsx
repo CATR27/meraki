@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <HeaderForUser />
           </Suspense>
         </header>
-        <ViewTransition enter="app-enter" default="none">
+        <ViewTransition enter="app-enter" exit="app-exit" default="none">
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
         </ViewTransition>
       </div>
