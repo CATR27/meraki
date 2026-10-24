@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CampanaServidor } from "@/features/recordatorios/components/campana-servidor";
@@ -13,7 +13,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-svh bg-background">
       <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
-        <Logo className="mb-8 px-2" />
+        <Logo morph className="mb-8 px-2" />
         <Suspense fallback={<NavSkeleton />}>
           <SidebarNavForUser />
         </Suspense>
@@ -28,7 +28,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <HeaderForUser />
           </Suspense>
         </header>
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
+        <ViewTransition enter="app-enter" default="none">
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
+        </ViewTransition>
       </div>
     </div>
   );

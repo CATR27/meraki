@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import { cn } from "@/lib/utils";
 
 /** Isotipo de Meraki: flor de loto de tres pétalos. */
@@ -20,15 +21,34 @@ export function LogoMark({ className }: { className?: string }) {
 export function Logo({
   variant = "default",
   className,
+  morph = false,
+  bloom = false,
 }: {
   variant?: "default" | "light";
   className?: string;
+  /** Nombra el isotipo para que viaje entre el login y la app al iniciar sesión. */
+  morph?: boolean;
+  /** Los pétalos se abren al montar (solo en la pantalla de acceso). */
+  bloom?: boolean;
 }) {
+  const mark = (
+    <LogoMark
+      className={cn(
+        "size-8",
+        variant === "light" ? "text-lavanda-100" : "text-lavanda-600",
+        bloom && "logo-bloom",
+      )}
+    />
+  );
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <LogoMark
-        className={cn("size-8", variant === "light" ? "text-lavanda-100" : "text-lavanda-600")}
-      />
+      {morph ? (
+        <ViewTransition name="logo-mark" share="logo-morph" default="none">
+          {mark}
+        </ViewTransition>
+      ) : (
+        mark
+      )}
       <span
         className={cn(
           "font-heading text-2xl font-bold tracking-tight",

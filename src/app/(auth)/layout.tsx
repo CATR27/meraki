@@ -1,4 +1,4 @@
-import { Logo } from "@/components/brand/logo";
+import { Logo, LogoMark } from "@/components/brand/logo";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
@@ -6,14 +6,15 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
       <aside className="relative hidden overflow-hidden bg-gradient-to-br from-lavanda-500 via-lavanda-700 to-lavanda-900 p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div
           aria-hidden="true"
-          className="absolute -top-24 -right-24 size-96 rounded-full bg-lavanda-300/30 blur-3xl"
+          className="absolute -top-24 -right-24 size-96 rounded-full bg-lavanda-300/30 blur-3xl motion-safe:animate-drift"
         />
         <div
           aria-hidden="true"
-          className="absolute -bottom-32 -left-16 size-[28rem] rounded-full bg-lavanda-400/25 blur-3xl"
+          className="absolute -bottom-32 -left-16 size-[28rem] rounded-full bg-lavanda-400/25 blur-3xl motion-safe:animate-drift-slow"
         />
-        <Logo variant="light" className="relative" />
-        <figure className="relative max-w-md">
+        <LogoMark className="pointer-events-none absolute top-1/2 -right-24 size-[34rem] -translate-y-1/2 text-white opacity-[0.08] motion-safe:animate-breathe" />
+        <Logo variant="light" morph bloom className="relative" />
+        <figure className="relative max-w-md motion-safe:animate-rise motion-safe:[animation-delay:450ms]">
           <blockquote className="font-heading text-3xl leading-snug font-semibold text-balance text-white">
             “Hacer algo con el alma, con creatividad y con amor.”
           </blockquote>
@@ -22,13 +23,13 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
             que acompañamos a cada consultante.
           </figcaption>
         </figure>
-        <p className="relative text-sm text-lavanda-200">
+        <p className="relative text-sm text-lavanda-200 motion-safe:animate-fade-in motion-safe:[animation-delay:900ms]">
           Expedientes, agenda y sesiones en un espacio seguro.
         </p>
       </aside>
       <main className="flex items-center justify-center bg-lavanda-50 px-4 py-10 sm:px-8">
         <div className="w-full max-w-md">
-          <Logo className="mb-8 lg:hidden" />
+          <Logo bloom className="mb-8 lg:hidden" />
           {children}
         </div>
       </main>

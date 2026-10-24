@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LoginForm } from "@/features/auth/components/login-form";
 
@@ -7,15 +7,19 @@ export const metadata: Metadata = { title: "Iniciar sesión" };
 
 export default function LoginPage() {
   return (
-    <section className="rounded-3xl border border-lavanda-100 bg-card p-8 shadow-xl shadow-lavanda-200/40 sm:p-10">
-      <h1 className="text-3xl font-bold">Hola de nuevo</h1>
-      <p className="mt-2 mb-8 text-muted-foreground">
-        Ingresa con la cuenta que te asignó la administración.
-      </p>
-      <Suspense fallback={<LoginFormSkeleton />}>
-        <LoginForm />
-      </Suspense>
-    </section>
+    <ViewTransition exit="login-exit" default="none">
+      <section className="rounded-3xl border border-lavanda-100 bg-card p-8 shadow-xl shadow-lavanda-200/40 motion-safe:animate-rise motion-safe:[animation-delay:200ms] sm:p-10">
+        <h1 className="text-3xl font-bold motion-safe:animate-rise motion-safe:[animation-delay:380ms]">
+          Hola de nuevo
+        </h1>
+        <p className="mt-2 mb-8 text-muted-foreground motion-safe:animate-rise motion-safe:[animation-delay:480ms]">
+          Ingresa con la cuenta que te asignó la administración.
+        </p>
+        <Suspense fallback={<LoginFormSkeleton />}>
+          <LoginForm />
+        </Suspense>
+      </section>
+    </ViewTransition>
   );
 }
 
