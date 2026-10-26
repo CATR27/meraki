@@ -2,6 +2,7 @@ import { PlusIcon, SearchIcon, SearchXIcon, ShieldCheckIcon, UsersRoundIcon } fr
 import type { Metadata } from "next";
 import Form from "next/form";
 import Link from "next/link";
+import { Ornamento } from "@/components/brand/ornamento";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,9 +25,10 @@ export default async function PsicologosPage({ searchParams }: PageProps<"/admin
 
   return (
     <>
-      <div className="animate-mk-up mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="animate-mk-up relative isolate mb-6 flex flex-wrap items-end justify-between gap-4">
+        <Ornamento n="17_arcos_de_paz" anim="breathe" op={0.9} dur={12} className="-top-[46px] right-[clamp(120px,22vw,320px)] -z-10 size-[150px]" />
         <div>
-          <h1 className="text-3xl font-bold tracking-[-0.02em] sm:text-[34px]">Psicólogos</h1>
+          <h1 className="text-[34px] font-bold tracking-[-0.02em]">Psicólogos</h1>
           <p className="mt-1 text-muted-foreground">Cuentas del equipo que acompaña desde Meraki.</p>
         </div>
         <Button asChild>
@@ -36,7 +38,7 @@ export default async function PsicologosPage({ searchParams }: PageProps<"/admin
         </Button>
       </div>
 
-      <div className="mb-6 grid gap-3.5 sm:grid-cols-3 lg:grid-cols-[repeat(3,minmax(0,1fr))_1.4fr]">
+      <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-3.5 @min-[1000px]:grid-cols-[repeat(3,minmax(0,1fr))_1.4fr]">
         {resumen.map((r, i) => (
           <div
             key={r.etiqueta}
@@ -52,7 +54,7 @@ export default async function PsicologosPage({ searchParams }: PageProps<"/admin
             <span className="text-[13px] text-muted-foreground">{r.etiqueta}</span>
           </div>
         ))}
-        <div className="animate-mk-up flex items-center gap-3 rounded-2xl bg-tint-2 px-[18px] py-3.5 [animation-delay:200ms] sm:col-span-3 lg:col-span-1">
+        <div className="animate-mk-up flex items-center gap-3 rounded-2xl bg-tint-2 px-[18px] py-3.5 [animation-delay:200ms]">
           <ShieldCheckIcon className="size-[22px] shrink-0 text-deep" aria-hidden="true" />
           <span className="text-[13px] leading-snug font-semibold text-soft-foreground">
             La administración no tiene acceso a información clínica.

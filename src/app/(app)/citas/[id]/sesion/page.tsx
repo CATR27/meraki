@@ -67,13 +67,13 @@ export default async function SesionPage({ params }: PageProps<"/citas/[id]/sesi
       </Link>
       <span
         aria-hidden="true"
-        className="flex size-12 shrink-0 items-center justify-center rounded-avatar bg-gradient-to-br from-[#c9aef0] to-[#7a45c6] font-heading font-bold text-white"
+        className="hidden size-12 shrink-0 items-center justify-center rounded-avatar @min-[600px]:flex bg-gradient-to-br from-[#c9aef0] to-[#7a45c6] font-heading font-bold text-white"
       >
         {iniciales(nombre)}
       </span>
-      <div className="grid min-w-0">
+      <div className="grid min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-2">
-          <h1 className="text-xl font-bold">
+          <h1 className="min-w-0 text-xl font-bold">
             <Link href={`/consultantes/${consultante.id}`} className="hover:text-deep">
               {nombre}
             </Link>
@@ -96,9 +96,9 @@ export default async function SesionPage({ params }: PageProps<"/citas/[id]/sesi
     <>
       {!cerrada && !cancelada && <Cronometro citaId={cita.id} duracionMin={duracion} />}
       {cita.enlaceVideollamada && !cerrada && (
-        <Button variant="outline" asChild>
+        <Button variant="outline" aria-label="Videollamada" className="size-11 px-0 @min-[900px]:size-auto @min-[900px]:px-4" asChild>
           <a href={cita.enlaceVideollamada} target="_blank" rel="noopener noreferrer">
-            <VideoIcon /> Videollamada
+            <VideoIcon /> <span className="sr-only @min-[900px]:not-sr-only">Videollamada</span>
           </a>
         </Button>
       )}
@@ -126,7 +126,7 @@ export default async function SesionPage({ params }: PageProps<"/citas/[id]/sesi
   return (
     <div className="grid gap-6">
       <CabeceraSesion izquierda={izquierda} acciones={acciones} />
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid gap-6 @min-[900px]:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
           {cerrada && nota ? (
             <NotaLectura nota={nota} zona={zona} />

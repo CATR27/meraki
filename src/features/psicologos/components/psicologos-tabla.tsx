@@ -34,7 +34,7 @@ export function PsicologosTabla({ psicologos }: { psicologos: PsicologoListado[]
   return (
     <>
       {/* Escritorio */}
-      <div className="animate-mk-up hidden overflow-hidden rounded-3xl border bg-card [animation-delay:240ms] md:block">
+      <div className="animate-mk-up hidden overflow-hidden rounded-3xl border bg-card [animation-delay:240ms] @min-[900px]:block">
         <Table>
           <TableHeader className="bg-tint">
             <TableRow>
@@ -72,7 +72,7 @@ export function PsicologosTabla({ psicologos }: { psicologos: PsicologoListado[]
       </div>
 
       {/* Móvil */}
-      <ul className="grid gap-3 md:hidden">
+      <ul className="grid gap-3 @min-[900px]:hidden">
         {psicologos.map((p) => (
           <li key={p.id} className="rounded-3xl border bg-card p-4">
             <div className="flex items-start justify-between gap-2">

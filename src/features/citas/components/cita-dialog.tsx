@@ -20,7 +20,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MODALIDADES } from "@/db/schema";
 import type { ActionState } from "@/lib/action-state";
@@ -79,7 +78,7 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
 
   return (
     <Dialog open onOpenChange={(open) => !open && cerrar()}>
-      <DialogContent className="max-h-[92svh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="font-heading text-xl">
             {citaId ? "Editar cita" : "Nueva cita"}
@@ -121,10 +120,12 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
               </NativeSelect>
             </Field>
 
-            <div className="grid gap-4 sm:grid-cols-3">
-              <Field id="fecha" label="Fecha" required error={err?.fecha}>
-                <Input name="fecha" type="date" defaultValue={v("fecha")} />
-              </Field>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 [&>*]:min-w-0">
+              <div className="col-span-2 sm:col-span-1">
+                <Field id="fecha" label="Fecha" required error={err?.fecha}>
+                  <Input name="fecha" type="date" defaultValue={v("fecha")} />
+                </Field>
+              </div>
               <Field id="hora" label="Hora" required error={err?.hora}>
                 <Input name="hora" type="time" step={300} defaultValue={v("hora")} />
               </Field>
@@ -143,14 +144,14 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
 
             <fieldset className="grid gap-2">
               <legend className="mb-2 text-sm font-semibold text-ink">Modalidad</legend>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {MODALIDADES.map((m) => {
                   const Icon = m === "presencial" ? MapPinIcon : VideoIcon;
                   return (
                     <label
                       key={m}
                       className={cn(
-                        "flex cursor-pointer items-center gap-2.5 rounded-xl border p-3 text-sm font-semibold transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+                        "flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl border p-3 text-sm font-semibold transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
                         modalidad === m
                           ? "border-lavanda-500 bg-tint text-soft-foreground"
                           : "hover:border-lavanda-300",
@@ -202,7 +203,7 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
               />
             </Field>
 
-            <div className="flex items-start gap-3 rounded-xl bg-tint p-3">
+            <label htmlFor="enviarConfirmacion" className="flex items-start gap-3 rounded-xl bg-tint p-3">
               <Checkbox
                 id="enviarConfirmacion"
                 name="enviarConfirmacion"
@@ -213,16 +214,16 @@ export function CitaDialog({ consultantes, defaults, citaId, cerrarHref }: Props
                 className="mt-0.5"
               />
               <div className="grid gap-0.5">
-                <Label htmlFor="enviarConfirmacion" className="font-semibold">
+                <span className="text-sm leading-none font-semibold">
                   {citaId ? "Avisar al consultante por correo" : "Enviar confirmación por correo"}
-                </Label>
+                </span>
                 <p className="text-xs text-muted-foreground">
                   {seleccionado && !puedeEnviar
                     ? "Este consultante no tiene correo registrado."
                     : "Incluye un archivo para agregarla a su calendario."}
                 </p>
               </div>
-            </div>
+            </label>
 
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={cerrar}>

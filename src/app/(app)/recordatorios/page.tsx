@@ -1,7 +1,7 @@
-import { BellRingIcon } from "lucide-react";
+import { BellRingIcon, PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/shared/empty-state";
-import { LogoMark } from "@/components/brand/logo";
+import { Ornamento } from "@/components/brand/ornamento";
 import { opcionesConsultantes } from "@/features/consultantes/queries";
 import { RecordatorioForm } from "@/features/recordatorios/components/recordatorio-form";
 import { RecordatorioItem } from "@/features/recordatorios/components/recordatorio-item";
@@ -22,14 +22,20 @@ export default async function RecordatoriosPage() {
 
   return (
     <>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid gap-6 @min-[900px]:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid content-start gap-[22px]">
           <div className="animate-mk-up">
-            <h1 className="text-3xl font-bold tracking-[-0.02em] sm:text-[34px]">Recordatorios</h1>
+            <h1 className="text-[clamp(26px,7vw,34px)] font-bold tracking-[-0.02em]">Recordatorios</h1>
             <p className="mt-1 max-w-[560px] text-muted-foreground">
               Pendientes personales. Los de hoy y los vencidos aparecen en la campana y en tu
               inicio.
             </p>
+            <a
+              href="#nuevo"
+              className="mt-3 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-extrabold text-primary-foreground @min-[900px]:hidden"
+            >
+              <PlusIcon className="size-4" aria-hidden="true" /> Nuevo recordatorio
+            </a>
           </div>
           {vacio ? (
             <EmptyState
@@ -56,8 +62,8 @@ export default async function RecordatoriosPage() {
           )}
         </div>
 
-        <aside className="animate-mk-up relative order-first h-fit overflow-hidden rounded-3xl border bg-card p-[26px] [animation-delay:120ms] lg:sticky lg:top-24 lg:order-none">
-          <LogoMark className="animate-mk-float pointer-events-none absolute -top-[30px] -right-[30px] size-[130px] text-lavanda-300 opacity-20" />
+        <aside id="nuevo" className="animate-mk-up relative h-fit scroll-mt-4 overflow-hidden rounded-3xl border bg-card p-4 @min-[640px]:p-[26px] [animation-delay:120ms] @min-[900px]:sticky @min-[900px]:top-0">
+          <Ornamento n="06_luna_botanica" anim="bob" op={0.85} dur={10} className="-top-[30px] -right-[30px] size-[150px]" />
           <h2 className="relative mb-4 text-xl font-bold">Nuevo recordatorio</h2>
           <RecordatorioForm
             consultantes={consultantes}

@@ -12,10 +12,10 @@ export function CabeceraSesion({
   final?: ReactNode;
 }) {
   return (
-    <header className="animate-mk-up flex flex-wrap items-center gap-x-4 gap-y-3 rounded-3xl border bg-card px-5 py-4">
+    <header className="animate-mk-up flex flex-wrap items-center gap-x-4 gap-y-3 rounded-3xl border bg-card px-4 py-4 @min-[600px]:px-5">
       {izquierda}
-      <div className="flex flex-wrap items-center gap-3 lg:ml-auto">{acciones}</div>
-      {final}
+      <div className="ml-auto flex flex-wrap items-center gap-2 @min-[600px]:gap-3">{acciones}</div>
+      {final && <div className="hidden @min-[600px]:block">{final}</div>}
     </header>
   );
 }

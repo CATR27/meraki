@@ -16,11 +16,11 @@ export async function ConsultanteHeader({ id }: { id: string }) {
     <header className="mb-5 grid gap-4">
       <Link
         href="/consultantes"
-        className="inline-flex items-center gap-1.5 justify-self-start text-sm font-bold text-muted-foreground hover:text-deep"
+        className="-my-2 inline-flex min-h-11 items-center gap-1.5 justify-self-start text-sm font-bold text-muted-foreground hover:text-deep"
       >
         <ArrowLeftIcon className="size-4" aria-hidden="true" /> Consultantes
       </Link>
-      <div className="animate-mk-up flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+      <div className="animate-mk-up flex flex-wrap items-center gap-5">
         <div className="relative size-[76px] shrink-0">
           <span
             aria-hidden="true"
@@ -30,8 +30,8 @@ export async function ConsultanteHeader({ id }: { id: string }) {
             {iniciales(nombre)}
           </span>
         </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-3xl font-bold tracking-[-0.02em] sm:text-[34px]">{nombre}</h1>
+        <div className="min-w-0 flex-1 basis-[200px]">
+          <h1 className="text-[clamp(26px,4vw,34px)] leading-tight font-bold tracking-[-0.02em]">{nombre}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-2.5 text-sm text-muted-foreground">
             <EstadoConsultanteBadge estado={c.estado} />
             {c.fechaNacimiento && (
@@ -53,7 +53,7 @@ export async function ConsultanteHeader({ id }: { id: string }) {
             )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2.5">
+        <div className="grid w-full shrink-0 grid-cols-2 gap-2.5 @min-[640px]:flex @min-[640px]:w-auto @min-[640px]:flex-wrap max-sm:[&>*]:h-11">
           <Button variant="outline" asChild>
             <Link href={`/consultantes/${c.id}/editar`}>
               <PencilIcon /> Editar datos

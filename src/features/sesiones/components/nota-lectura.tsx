@@ -38,7 +38,7 @@ export function NotaLectura({ nota, zona }: { nota: NonNullable<Sesion["nota"]>;
         </StatusBadge>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 @min-[600px]:grid-cols-2">
         {CAMPOS_SOAP.map(({ campo, label, guia }, i) => (
           <section
             key={campo}
@@ -61,7 +61,7 @@ export function NotaLectura({ nota, zona }: { nota: NonNullable<Sesion["nota"]>;
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 @min-[600px]:grid-cols-2">
         {extras.map(({ label, valor }) => (
           <section key={label} className="rounded-3xl border bg-card px-[22px] py-5">
             <h2 className="font-sans text-sm font-extrabold tracking-normal">{label}</h2>

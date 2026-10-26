@@ -2,6 +2,7 @@ import { SearchIcon, SearchXIcon, UserPlusIcon, UsersRoundIcon } from "lucide-re
 import type { Metadata } from "next";
 import Form from "next/form";
 import Link from "next/link";
+import { Ornamento } from "@/components/brand/ornamento";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Pagination } from "@/components/shared/pagination";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export default async function ConsultantesPage({ searchParams }: PageProps<"/con
   const q = typeof sp.q === "string" ? sp.q : "";
   const estado = FILTROS_ESTADO.includes(sp.estado as FiltroEstado)
     ? (sp.estado as FiltroEstado)
-    : "activo";
+    : "todos";
   const pagina = Math.max(1, Number.parseInt(String(sp.pagina ?? "1"), 10) || 1);
 
   const [{ consultantes, total, paginas }, conteos] = await Promise.all([
@@ -44,7 +45,7 @@ export default async function ConsultantesPage({ searchParams }: PageProps<"/con
       string,
       string
     >);
-    if (params.get("estado") === "activo") params.delete("estado");
+    if (params.get("estado") === "todos") params.delete("estado");
     if (params.get("pagina") === "1") params.delete("pagina");
     const qs = params.toString();
     return `/consultantes${qs ? `?${qs}` : ""}`;
@@ -52,9 +53,10 @@ export default async function ConsultantesPage({ searchParams }: PageProps<"/con
 
   return (
     <>
-      <div className="animate-mk-up mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="animate-mk-up relative isolate mb-6 flex flex-wrap items-end justify-between gap-4">
+        <Ornamento n="19_hojas_suaves" anim="sway" op={0.9} dur={12} className="-top-[46px] right-[clamp(120px,22vw,320px)] -z-10 size-[150px]" />
         <div>
-          <h1 className="text-3xl font-bold tracking-[-0.02em] sm:text-[34px]">Consultantes</h1>
+          <h1 className="text-[34px] font-bold tracking-[-0.02em]">Consultantes</h1>
           <p className="mt-1 text-muted-foreground">
             Las personas que acompañas, cada una con su propio ritmo.
           </p>
@@ -66,9 +68,9 @@ export default async function ConsultantesPage({ searchParams }: PageProps<"/con
         </Button>
       </div>
 
-      <div className="animate-mk-up mb-6 flex flex-col gap-3 [animation-delay:60ms] lg:flex-row lg:flex-wrap lg:items-center">
-        <Form action="/consultantes" role="search" className="w-full lg:w-[360px]">
-          {estado !== "activo" && <input type="hidden" name="estado" value={estado} />}
+      <div className="animate-mk-up mb-6 flex flex-wrap items-center gap-3 [animation-delay:60ms]">
+        <Form action="/consultantes" role="search" className="w-[min(100%,360px)]">
+          {estado !== "todos" && <input type="hidden" name="estado" value={estado} />}
           <label htmlFor="q" className="sr-only">
             Buscar consultantes
           </label>
@@ -82,7 +84,7 @@ export default async function ConsultantesPage({ searchParams }: PageProps<"/con
               name="q"
               type="search"
               defaultValue={q}
-              placeholder="Buscar por nombre, teléfono o correo"
+              placeholder="Buscar por nombre o teléfono"
               className="h-[46px] rounded-full border-[1.5px] border-lavanda-300 pr-4 pl-11 shadow-[0_0_0_4px_var(--tint-2)]"
             />
           </div>
@@ -144,7 +146,7 @@ export default async function ConsultantesPage({ searchParams }: PageProps<"/con
         <EmptyState
           icon={UsersRoundIcon}
           title={
-            estado === "activo"
+            estado === "activo" || estado === "todos"
               ? "Aún no tienes consultantes en proceso"
               : "No hay consultantes aquí"
           }

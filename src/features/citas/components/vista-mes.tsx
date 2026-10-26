@@ -48,7 +48,7 @@ export function VistaMes({
             <div
               key={d}
               className={cn(
-                "min-h-24 border-t p-1.5 sm:min-h-28",
+                "min-h-16 border-t p-1 @min-[640px]:min-h-28 @min-[640px]:p-1.5",
                 i % 7 !== 0 && "border-l",
                 fueraDeMes && "bg-muted/40",
               )}
@@ -56,7 +56,7 @@ export function VistaMes({
               <Link
                 href={agendaHref({ vista: "dia", fecha: d })}
                 className={cn(
-                  "mb-1 flex size-8 items-center justify-center rounded-full font-heading text-sm font-bold transition-colors hover:bg-tint-2",
+                  "mx-auto mb-1 flex size-9 items-center justify-center rounded-full @min-[640px]:mx-0 @min-[640px]:size-8 font-heading text-sm font-bold transition-colors hover:bg-tint-2",
                   d === hoy && "rounded-[50%_50%_50%_12%] bg-primary text-primary-foreground hover:bg-primary/90",
                   fueraDeMes && d !== hoy && "text-muted-foreground",
                 )}
@@ -64,18 +64,25 @@ export function VistaMes({
               >
                 {Number(d.slice(8))}
               </Link>
-              <ul className="grid gap-1">
+              {delDia.length > 0 && (
+                <div className="flex justify-center gap-0.5 @min-[640px]:hidden" aria-hidden="true">
+                  {delDia.slice(0, 3).map((c) => (
+                    <span key={c.id} className={cn("size-1.5 rounded-full border", ESTADO_CITA_BLOQUE[c.estado])} />
+                  ))}
+                </div>
+              )}
+              <ul className="hidden gap-1 @min-[640px]:grid">
                 {delDia.slice(0, MAX_VISIBLES).map((c) => (
                   <li key={c.id}>
                     <Link
                       href={agendaHref({ vista: "mes", fecha, cita: c.id })}
                       scroll={false}
                       className={cn(
-                        "block truncate rounded-xl border px-1.5 py-0.5 text-[0.7rem] font-bold sm:text-xs",
+                        "block truncate rounded-xl border px-1.5 py-0.5 text-[0.7rem] font-bold @min-[700px]:text-xs",
                         ESTADO_CITA_BLOQUE[c.estado],
                       )}
                     >
-                      <span className="hidden sm:inline">
+                      <span className="hidden @min-[700px]:inline">
                         {formatEnZona(c.inicio, "HH:mm", zona)}{" "}
                       </span>
                       {c.nombre}

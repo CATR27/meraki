@@ -8,7 +8,7 @@ import { EstadoConsultanteBadge } from "./estado-badge";
 
 type Props = { consultantes: ConsultanteListado[]; zona: string; hoy: string };
 
-const COLUMNAS = "md:grid-cols-[minmax(0,2.2fr)_1.1fr_1.3fr_1fr_32px]";
+const COLUMNAS = "@min-[820px]:grid-cols-[minmax(0,2.2fr)_1.1fr_1.3fr_1fr_32px]";
 
 function Persona({ c, hoy }: { c: ConsultanteListado; hoy: string }) {
   const nombre = nombreCompleto(c);
@@ -49,7 +49,7 @@ export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
   return (
     <>
       <div
-        className={`hidden gap-4 px-6 pb-2 text-xs font-extrabold tracking-[0.1em] text-muted-foreground uppercase md:grid ${COLUMNAS}`}
+        className={`hidden gap-4 px-6 pb-2 text-xs font-extrabold tracking-[0.1em] text-muted-foreground uppercase @min-[820px]:grid ${COLUMNAS}`}
       >
         <span>Consultante</span>
         <span>Estado</span>
@@ -58,12 +58,12 @@ export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
         <span />
       </div>
 
-      <ul className="hidden gap-2.5 md:grid">
+      <ul className="hidden gap-2.5 @min-[820px]:grid">
         {consultantes.map((c, i) => (
           <li
             key={c.id}
             style={{ animationDelay: `${100 + i * 50}ms` }}
-            className={`group animate-mk-up relative items-center gap-4 rounded-2xl border bg-card px-6 py-3.5 transition-[transform,border-color,box-shadow] hover:translate-x-1 hover:border-lavanda-300 hover:shadow-[0_14px_28px_-22px_rgba(101,52,168,0.6)] md:grid ${COLUMNAS}`}
+            className={`group animate-mk-up relative items-center gap-4 rounded-2xl border bg-card px-6 py-3.5 transition-[transform,border-color,box-shadow] hover:translate-x-1 hover:border-lavanda-300 hover:shadow-[0_14px_28px_-22px_rgba(101,52,168,0.6)] @min-[820px]:grid ${COLUMNAS}`}
           >
             {/* El enlace cubre toda la fila (after:inset-0) */}
             <Link
@@ -85,14 +85,19 @@ export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
         ))}
       </ul>
 
-      <ul className="grid gap-3 md:hidden">
+      <ul className="grid gap-3 @min-[820px]:hidden">
         {consultantes.map((c) => (
           <li key={c.id}>
             <Link
               href={`/consultantes/${c.id}`}
               className="block rounded-2xl border bg-card p-4 transition-colors hover:border-lavanda-300"
             >
-              <Persona c={c} hoy={hoy} />
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <Persona c={c} hoy={hoy} />
+                </div>
+                <ChevronRightIcon className="size-[18px] shrink-0 text-muted-foreground" aria-hidden="true" />
+              </div>
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                 <EstadoConsultanteBadge estado={c.estado} />
                 {!c.consentimientoInformado && <SinConsentimiento />}
@@ -101,6 +106,9 @@ export function ConsultantesLista({ consultantes, zona, hoy }: Props) {
                     <CalendarClockIcon className="size-3.5" aria-hidden="true" />
                     {proxima(c.proximaCita)}
                   </span>
+                )}
+                {c.ultimaSesion && (
+                  <span className="text-muted-foreground">Última: {formatFecha(c.ultimaSesion, zona)}</span>
                 )}
               </div>
             </Link>

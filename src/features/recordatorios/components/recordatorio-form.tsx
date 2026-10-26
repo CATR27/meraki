@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon, PlusIcon } from "lucide-react";
 import { useActionState, useState } from "react";
 import { toast } from "sonner";
 import { Field } from "@/components/shared/form-field";
@@ -42,23 +42,37 @@ function Formulario({
 
   return (
     <form action={formAction} noValidate className="relative grid gap-4">
-      <Field id="titulo" label="¿Qué necesitas recordar?" required error={err?.titulo}>
+      <Field id="titulo" label="Título" required error={err?.titulo}>
         <Input
           name="titulo"
           placeholder="Enviar informe, llamar a la escuela…"
           defaultValue={v("titulo")}
           maxLength={120}
+          className="rounded-2xl"
         />
       </Field>
-      <div className="grid grid-cols-2 gap-3">
+      <Field id="descripcion" label="Descripción (opcional)" error={err?.descripcion}>
+        <Textarea
+          name="descripcion"
+          defaultValue={v("descripcion")}
+          className="min-h-[60px] rounded-2xl placeholder-shown:bg-tint focus-visible:bg-card"
+        />
+      </Field>
+      <div className="grid gap-3 @min-[560px]:grid-cols-2 @min-[900px]:grid-cols-1">
         <Field id="fecha" label="Fecha" required error={err?.fecha}>
-          <Input name="fecha" type="date" defaultValue={v("fecha", hoy)} />
+          <div className="relative">
+            <CalendarIcon aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 size-[15px] -translate-y-1/2 text-accent" />
+            <Input name="fecha" type="date" defaultValue={v("fecha", hoy)} className="min-w-0 rounded-2xl pl-9" />
+          </div>
         </Field>
         <Field id="hora" label="Hora" required error={err?.hora}>
-          <Input name="hora" type="time" step={300} defaultValue={v("hora", horaSugerida)} />
+          <div className="relative">
+            <ClockIcon aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 size-[15px] -translate-y-1/2 text-accent" />
+            <Input name="hora" type="time" step={300} defaultValue={v("hora", horaSugerida)} className="min-w-0 rounded-2xl pl-9" />
+          </div>
         </Field>
       </div>
-      <Field id="consultanteId" label="Relacionado con (opcional)" error={err?.consultanteId}>
+      <Field id="consultanteId" label="Consultante (opcional)" error={err?.consultanteId}>
         <NativeSelect name="consultanteId" defaultValue={v("consultanteId")}>
           <option value="">Ningún consultante</option>
           {consultantes.map((c) => (
@@ -67,9 +81,6 @@ function Formulario({
             </option>
           ))}
         </NativeSelect>
-      </Field>
-      <Field id="descripcion" label="Detalles (opcional)" error={err?.descripcion}>
-        <Textarea name="descripcion" defaultValue={v("descripcion")} className="min-h-20" />
       </Field>
       <SubmitButton pendingText="Guardando…" size="lg" className="w-full font-extrabold">
         <PlusIcon /> Guardar recordatorio

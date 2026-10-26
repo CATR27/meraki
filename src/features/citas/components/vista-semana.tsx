@@ -43,23 +43,24 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
     <div className="animate-mk-up overflow-hidden rounded-3xl border bg-card [animation-delay:100ms]">
       <ScrollAHora
         offsetPx={horaAncla * ALTO_HORA}
-        className="max-h-[calc(100svh-15rem)] min-h-96 overflow-auto overscroll-contain"
+        className="h-[calc(100dvh-17rem)] max-h-[720px] min-h-[360px] overflow-auto overscroll-contain"
       >
-        <div className={cn(vista === "semana" && "min-w-[46rem]")}>
+        <div className={cn(vista === "semana" && "min-w-[720px]")}>
           {/* Encabezado de días */}
           <div
-            className="sticky top-0 z-30 grid border-b bg-card/95 backdrop-blur"
+            className="sticky top-0 z-30 grid border-b bg-card"
             style={{ gridTemplateColumns: `4rem repeat(${dias.length}, minmax(0, 1fr))` }}
           >
-            <div />
+            <div className="sticky left-0 z-10 bg-card" />
             {dias.map((d) => {
               const esHoy = d === hoy;
+              const total = citasPorDia.get(d)?.filter((c) => c.estado !== "cancelada").length ?? 0;
               return (
                 <Link
                   key={d}
                   href={agendaHref({ vista: "dia", fecha: d })}
                   className={cn(
-                    "flex items-center justify-center gap-2.5 border-l px-2 py-3 transition-colors hover:bg-tint-2/60",
+                    "flex items-center gap-2 border-l px-2 pt-3.5 pb-3 transition-colors @min-[900px]:gap-2.5 @min-[900px]:px-3 hover:bg-tint-2/60",
                     esHoy && "bg-tint",
                   )}
                 >
@@ -73,8 +74,13 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                   >
                     {Number(d.slice(8))}
                   </span>
-                  <span className="hidden text-sm font-extrabold capitalize sm:block">
-                    {formatEnZona(inicioDelDia(d, zona), "EEE", zona)}
+                  <span className="grid min-w-0 leading-tight">
+                    <span className="truncate text-sm font-extrabold text-foreground capitalize">
+                      {formatEnZona(inicioDelDia(d, zona), "EEE", zona)}
+                    </span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {total} {total === 1 ? "cita" : "citas"}
+                    </span>
                   </span>
                 </Link>
               );
@@ -86,14 +92,14 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
             className="grid"
             style={{ gridTemplateColumns: `4rem repeat(${dias.length}, minmax(0, 1fr))` }}
           >
-            <div className="relative" style={{ height: HORAS.length * ALTO_HORA }}>
+            <div className="sticky left-0 z-10 bg-card" style={{ height: HORAS.length * ALTO_HORA }}>
               {HORAS.map((h, i) => (
                 <span
                   key={h}
-                  className="absolute right-2 -translate-y-1/2 text-xs font-semibold text-muted-foreground"
+                  className="absolute right-2.5 pt-1 text-xs font-bold text-muted-foreground"
                   style={{ top: i * ALTO_HORA }}
                 >
-                  {i === 0 ? "" : `${String(h).padStart(2, "0")}:00`}
+                  {`${String(h).padStart(2, "0")}:00`}
                 </span>
               ))}
             </div>
@@ -116,7 +122,7 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                     })}
                     scroll={false}
                     aria-label={`Agendar el ${d} a las ${h}:00`}
-                    className="absolute inset-x-0 border-t border-border/60 transition-colors hover:bg-tint-2/60 focus-visible:bg-tint-2 focus-visible:outline-none"
+                    className="absolute inset-x-0 border-t border-muted transition-colors hover:bg-tint-2/60 focus-visible:bg-tint-2 focus-visible:outline-none"
                     style={{ top: i * ALTO_HORA, height: ALTO_HORA }}
                   />
                 ))}
@@ -132,29 +138,35 @@ export function VistaSemana({ vista, fecha, dias, citas, zona, hoy, ahora }: Pro
                 )}
 
                 {(citasPorDia.get(d) ?? []).map((c) => {
-                  const { top, height } = posicionEnDia(c.inicio, c.fin, zona);
+                  const pos = posicionEnDia(c.inicio, c.fin, zona);
+                  // Una cita fuera del horario visible se ancla al borde en vez de salirse de la rejilla.
+                  const { height } = pos;
+                  const top = Math.min(pos.top, 100 - height);
                   return (
                     <Link
                       key={c.id}
                       href={agendaHref({ vista, fecha, cita: c.id })}
                       scroll={false}
                       className={cn(
-                        "absolute inset-x-1.5 z-10 overflow-hidden rounded-2xl border px-2.5 py-2 text-xs transition-[transform,box-shadow] hover:z-20 hover:scale-[1.03] hover:shadow-[0_14px_24px_-14px_rgba(58,31,97,0.5)] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+                        "absolute inset-x-1.5 z-10 overflow-hidden rounded-2xl border px-2 py-1 transition-[transform,box-shadow] @min-[640px]:px-2.5 @min-[640px]:py-2 [@media(hover:hover)]:hover:z-20 [@media(hover:hover)]:hover:scale-[1.03] [@media(hover:hover)]:hover:shadow-[0_14px_24px_-14px_rgba(58,31,97,0.5)] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
                         ESTADO_CITA_BLOQUE[c.estado],
                       )}
                       style={{ top: `${top}%`, height: `${height}%` }}
                     >
-                      <span className="flex items-center gap-1 font-bold">
+                      <span className="block text-xs font-bold opacity-85">
+                        {formatEnZona(c.inicio, "HH:mm", zona)}
+                        <span className={cn(vista === "semana" && "hidden @min-[1000px]:inline")}>
+                          {" – "}
+                          {formatEnZona(c.fin, "HH:mm", zona)}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-1 text-[13px] leading-tight font-extrabold">
                         {c.modalidad === "en_linea" && (
                           <VideoIcon className="size-3 shrink-0" aria-label="En línea" />
                         )}
                         <span className="truncate">
                           {c.nombre} {c.apellidos}
                         </span>
-                      </span>
-                      <span className="block opacity-85">
-                        {formatEnZona(c.inicio, "HH:mm", zona)} –{" "}
-                        {formatEnZona(c.fin, "HH:mm", zona)}
                       </span>
                     </Link>
                   );

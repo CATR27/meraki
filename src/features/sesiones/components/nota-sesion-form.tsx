@@ -8,6 +8,7 @@ import {
   PhoneIcon,
   TriangleAlertIcon,
 } from "lucide-react";
+import { Ornamento } from "@/components/brand/ornamento";
 import { type ReactNode, useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Field } from "@/components/shared/form-field";
@@ -80,6 +81,8 @@ export function NotaSesionForm({
   const [valores, setValores] = useState(inicial);
   const [estado, setEstado] = useState<Estado>({ tipo: "inicial" });
   const [finalizando, startFinalizar] = useTransition();
+  // En pantallas angostas solo se muestra una letra del SOAP a la vez.
+  const [activo, setActivo] = useState(0);
 
   // Cola de guardado: nunca hay dos guardados simultáneos y siempre se guarda lo último.
   const valoresRef = useRef(valores);
@@ -179,28 +182,55 @@ export function NotaSesionForm({
   );
 
   return (
-    <div className="grid gap-6">
+    <div data-sesion className="relative isolate grid gap-6">
+      <Ornamento n="14_ola_botanica" anim="breathe" op={0.55} dur={14} origen="0% 100%" className="bottom-0 left-0 -z-10 hidden size-[440px] [mask-image:linear-gradient(90deg,#000_55%,transparent)] @min-[900px]:block" />
       <CabeceraSesion
         izquierda={cabeceraIzquierda}
         acciones={cabeceraAcciones}
         final={finalizarBoton}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="relative grid gap-6 @min-[900px]:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid min-w-0 content-start gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-[22px] font-bold">Nota de evolución</h2>
             <EstadoGuardado estado={estado} onReintentar={() => void guardar()} />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div role="tablist" aria-label="Secciones de la nota" className="sticky top-0 z-10 -mx-1 flex gap-1.5 bg-background/95 px-1 py-2 backdrop-blur @min-[600px]:hidden">
+            {CAMPOS_SOAP.map(({ campo, label }, i) => (
+              <button
+                key={campo}
+                type="button"
+                role="tab"
+                aria-selected={i === activo}
+                aria-label={label}
+                onClick={() => setActivo(i)}
+                className={cn(
+                  "flex h-[46px] flex-1 items-center justify-center rounded-leaf font-heading text-lg font-bold transition-colors",
+                  i === activo
+                    ? "bg-primary text-primary-foreground"
+                    : valores[campo].trim()
+                      ? "bg-tint-3 text-deep"
+                      : "bg-tint text-deep",
+                )}
+              >
+                {label.charAt(0)}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid gap-4 @min-[600px]:grid-cols-2">
             {CAMPOS_SOAP.map(({ campo, label, guia }, i) => {
               const lleno = valores[campo].trim().length > 0;
               return (
                 <section
                   key={campo}
                   style={{ animationDelay: `${100 + i * 70}ms` }}
-                  className="animate-mk-up flex min-h-56 flex-col gap-2 rounded-3xl border bg-card px-[22px] py-5 transition-shadow focus-within:border-lavanda-300 focus-within:shadow-[0_0_0_4px_var(--tint-2)]"
+                  className={cn(
+                    "animate-mk-up flex min-h-56 flex-col gap-2 rounded-3xl border bg-card px-[22px] py-5 transition-shadow focus-within:border-lavanda-300 focus-within:shadow-[0_0_0_4px_var(--tint-2)]",
+                    i !== activo && "hidden @min-[600px]:flex",
+                  )}
                 >
                   <div className="flex items-center gap-3">
                     <span
@@ -227,28 +257,32 @@ export function NotaSesionForm({
                     onChange={(e) => cambiar(campo, e.target.value)}
                     placeholder="Escribe aquí…"
                     maxLength={20_000}
-                    className="min-h-36 flex-1 resize-none rounded-none border-0 bg-transparent p-0 text-sm leading-relaxed shadow-none focus-visible:ring-0"
+                    className="min-h-[calc(100dvh-24rem)] flex-1 resize-none rounded-none @min-[600px]:min-h-36 border-0 bg-transparent p-0 text-sm leading-relaxed shadow-none focus-visible:ring-0"
                   />
                 </section>
               );
             })}
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+          <div className="grid gap-4 @min-[700px]:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
             <fieldset className="animate-mk-up rounded-3xl border bg-card px-[22px] py-[18px] [animation-delay:400ms]">
               <legend className="sr-only">Estado de ánimo percibido</legend>
               <p className="text-sm font-extrabold text-ink" aria-hidden="true">
                 Estado de ánimo percibido{" "}
-                <span className="text-xs font-semibold text-muted-foreground">
-                  · 1 = muy bajo · 10 = muy bueno
+                <span className="block text-xs font-semibold text-muted-foreground @min-[600px]:inline">
+                  <span className="hidden @min-[600px]:inline">· </span>1 = muy bajo · 10 = muy bueno
                 </span>
               </p>
-              <div className="mt-3 flex h-[58px] items-end gap-1.5">
+              <div className="mt-3 grid grid-cols-5 gap-2 @min-[600px]:flex @min-[600px]:h-[58px] @min-[600px]:items-end @min-[600px]:gap-1.5">
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
                   const actual = valores.estadoAnimo === String(n);
                   const menor = Number(valores.estadoAnimo) > n;
                   return (
-                    <label key={n} className="flex-1 self-end" style={{ height: `${30 + n * 7}%` }}>
+                    <label
+                      key={n}
+                      className="h-12 self-end @min-[600px]:h-[var(--h)] @min-[600px]:flex-1"
+                      style={{ "--h": `${30 + n * 7}%` } as React.CSSProperties}
+                    >
                       <input
                         type="radio"
                         name="estadoAnimo"
@@ -278,7 +312,7 @@ export function NotaSesionForm({
 
             <fieldset className="animate-mk-up rounded-3xl border bg-card px-[22px] py-[18px] [animation-delay:460ms]">
               <legend className="mb-3 text-sm font-extrabold text-ink">Nivel de riesgo</legend>
-              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-1.5 @min-[420px]:grid-cols-4">
                 {NIVELES_RIESGO.map((r) => (
                   <label key={r}>
                     <input
@@ -316,7 +350,7 @@ export function NotaSesionForm({
                     <PhoneIcon className="size-3.5" aria-hidden="true" />
                     Contacto de emergencia: {contactoEmergencia.nombre ?? "Sin nombre"}
                     {contactoEmergencia.parentesco && ` (${contactoEmergencia.parentesco})`} ·{" "}
-                    <a href={`tel:${contactoEmergencia.telefono}`} className="font-bold underline">
+                    <a href={`tel:${contactoEmergencia.telefono}`} className="inline-flex min-h-11 items-center font-bold underline">
                       {contactoEmergencia.telefono}
                     </a>
                   </p>
@@ -327,7 +361,7 @@ export function NotaSesionForm({
             </div>
           )}
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 @min-[600px]:grid-cols-2">
             <section className="animate-mk-up rounded-3xl border bg-card px-[22px] py-5 [animation-delay:520ms]">
               <Field
                 id="tareasAsignadas"
@@ -355,6 +389,10 @@ export function NotaSesionForm({
           </div>
         </div>
         {lateral}
+      </div>
+
+      <div className="sticky bottom-0 z-20 -mx-[clamp(16px,3vw,32px)] border-t bg-background/95 px-[clamp(16px,3vw,32px)] pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur @min-[600px]:hidden [&_button]:h-[52px] [&_button]:w-full">
+        {finalizarBoton}
       </div>
     </div>
   );

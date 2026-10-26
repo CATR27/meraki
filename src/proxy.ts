@@ -1,7 +1,8 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login"];
+// /offline la sirve el service worker cuando no hay red (sin sesión que validar).
+const PUBLIC_PATHS = ["/login", "/offline"];
 
 /**
  * Chequeo optimista: solo comprueba que exista la cookie de sesión.

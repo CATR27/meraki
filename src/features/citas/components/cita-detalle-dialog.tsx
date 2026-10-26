@@ -81,9 +81,9 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
               {MODALIDAD_LABEL[cita.modalidad]}
             </StatusBadge>
           </div>
-          <DialogTitle className="font-heading text-2xl">{nombre}</DialogTitle>
-          <DialogDescription className="flex items-center gap-2 text-base">
-            <CalendarClockIcon className="size-4 text-lavanda-600" aria-hidden="true" />
+          <DialogTitle className="font-heading text-2xl leading-tight">{nombre}</DialogTitle>
+          <DialogDescription className="flex items-start gap-2 text-base">
+            <CalendarClockIcon className="mt-1 size-4 shrink-0 text-lavanda-600" aria-hidden="true" />
             {mayuscula(formatEnZona(cita.inicio, "EEEE d 'de' MMMM, HH:mm", zona))} · {duracion} min
           </DialogDescription>
         </DialogHeader>
@@ -136,7 +136,7 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
               </Link>
             </Button>
           )}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2 sm:grid-cols-2 max-sm:[&>*]:h-11">
             <Button variant="outline" asChild>
               <Link href={`/consultantes/${cita.consultanteId}/expediente`}>
                 <FileTextIcon /> Expediente
@@ -144,7 +144,7 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
             </Button>
             <Button variant="outline" asChild>
               <Link href={editarHref} scroll={false}>
-                <PencilIcon /> Editar / reprogramar
+                <PencilIcon /> Reprogramar
               </Link>
             </Button>
           </div>
@@ -152,7 +152,7 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
 
         <Separator />
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 max-sm:[&>*]:h-11 sm:flex sm:flex-wrap">
           {cita.estado === "programada" && (
             <Button
               variant="secondary"
@@ -184,6 +184,7 @@ export function CitaDetalleDialog({ cita, zona, cerrarHref, editarHref }: Props)
               <Button
                 variant="destructive"
                 size="sm"
+                className="col-span-2 sm:col-auto"
                 disabled={pending}
                 onClick={() => estado("cancelada")}
               >

@@ -59,7 +59,7 @@ export function RecordatorioItem({
         "group flex items-start gap-3 transition-[opacity,transform]",
         compacto
           ? "rounded-2xl bg-tint px-3 py-2.5"
-          : "rounded-2xl border bg-card px-5 py-4 hover:translate-x-1",
+          : "rounded-2xl border bg-card px-4 py-4 @min-[640px]:px-5 [@media(hover:hover)]:hover:translate-x-1",
         !compacto && atrasado && "border-destructive/30",
         hecho && "opacity-55",
         pending && "opacity-70",
@@ -72,7 +72,7 @@ export function RecordatorioItem({
         aria-label={hecho ? `Marcar “${titulo}” como pendiente` : `Marcar “${titulo}” como hecho`}
         style={{ borderColor: color, background: hecho ? color : "transparent" }}
         className={cn(
-          "mt-0.5 flex shrink-0 items-center justify-center rounded-leaf border-2 text-white transition-all",
+          "relative mt-0.5 flex shrink-0 items-center justify-center rounded-leaf border-2 text-white transition-all after:absolute after:-inset-3 after:content-['']",
           compacto ? "size-[18px]" : "size-6",
         )}
       >
@@ -81,7 +81,7 @@ export function RecordatorioItem({
       <div className="grid min-w-0 flex-1 gap-1">
         <p
           className={cn(
-            "font-extrabold text-foreground",
+            "font-extrabold break-words text-foreground",
             compacto && "text-sm font-bold",
             hecho && "line-through",
           )}
@@ -89,7 +89,7 @@ export function RecordatorioItem({
           {titulo}
         </p>
         {descripcion && !compacto && (
-          <p className="text-[13px] whitespace-pre-line text-muted-foreground">{descripcion}</p>
+          <p className="text-[13px] break-words whitespace-pre-line text-muted-foreground">{descripcion}</p>
         )}
         <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <span
@@ -103,7 +103,7 @@ export function RecordatorioItem({
           {consultante && !compacto && (
             <Link
               href={`/consultantes/${consultante.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full bg-tint-2 px-2.5 py-px text-xs font-bold text-soft-foreground hover:underline"
+              className="inline-flex items-center gap-1.5 rounded-full bg-tint-2 px-2.5 py-1.5 text-xs font-bold text-soft-foreground hover:underline"
             >
               <UserRoundIcon className="size-3" aria-hidden="true" />
               {consultante.nombre}
@@ -118,7 +118,7 @@ export function RecordatorioItem({
           onClick={eliminar}
           disabled={pending}
           aria-label={`Eliminar “${titulo}”`}
-          className="opacity-60 group-hover:opacity-100 focus-visible:opacity-100"
+          className="-my-1 max-sm:size-11 [@media(hover:hover)]:opacity-60 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100"
         >
           <Trash2Icon />
         </Button>

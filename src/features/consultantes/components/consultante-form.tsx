@@ -46,18 +46,19 @@ export function ConsultanteForm({
   );
 
   return (
-    <Card>
-      <CardContent>
+    <Card className="border-0 bg-transparent py-0 shadow-none ring-0 @min-[560px]:border @min-[560px]:bg-card @min-[560px]:py-(--card-spacing)">
+      <CardContent className="px-0 @min-[560px]:px-(--card-spacing)">
         <form action={formAction} noValidate>
           <FormMessage state={state} className="mb-6" />
 
           <FormSection title="Identificación" description="Datos de la ficha de identificación.">
             <Field id="nombre" label="Nombre(s)" required error={err?.nombre}>
-              <Input name="nombre" defaultValue={v("nombre")} autoComplete="off" maxLength={80} />
+              <Input name="nombre" defaultValue={v("nombre")} autoComplete="off" autoCapitalize="words" maxLength={80} />
             </Field>
             <Field id="apellidos" label="Apellidos" required error={err?.apellidos}>
               <Input
                 name="apellidos"
+                autoCapitalize="words"
                 defaultValue={v("apellidos")}
                 autoComplete="off"
                 maxLength={80}
@@ -106,7 +107,7 @@ export function ConsultanteForm({
               id="direccion"
               label="Dirección"
               error={err?.direccion}
-              className="sm:col-span-2"
+              className="@min-[560px]:col-span-2"
             >
               <Input name="direccion" defaultValue={v("direccion")} />
             </Field>
@@ -165,7 +166,7 @@ export function ConsultanteForm({
                 </NativeSelect>
               </Field>
             )}
-            <div className="flex items-start gap-3 rounded-xl border border-tint-3 bg-tint p-4 sm:col-span-2">
+            <div className="flex items-start gap-3 rounded-xl border border-tint-3 bg-tint p-4 @min-[560px]:col-span-2">
               <Checkbox
                 id="consentimientoInformado"
                 name="consentimientoInformado"
@@ -197,7 +198,7 @@ export function ConsultanteForm({
             </div>
           </FormSection>
 
-          <div className="flex flex-wrap justify-end gap-2 border-t border-border/70 pt-6">
+          <div className="flex flex-col-reverse gap-2 border-t border-border/70 pt-6 @min-[640px]:flex-row @min-[640px]:justify-end max-sm:[&>*]:h-12 max-sm:[&>*]:w-full">
             <Button variant="ghost" asChild>
               <Link href={cancelarHref}>Cancelar</Link>
             </Button>

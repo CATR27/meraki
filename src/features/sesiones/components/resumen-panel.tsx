@@ -1,6 +1,6 @@
 import { ClipboardListIcon, HistoryIcon, ListTodoIcon } from "lucide-react";
 import Link from "next/link";
-import { LogoMark } from "@/components/brand/logo";
+import { Ornamento } from "@/components/brand/ornamento";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { formatEnZona } from "@/lib/dates";
 import { RIESGO_LABEL } from "../schemas";
@@ -22,7 +22,7 @@ export function ResumenPanel({ sesion, zona }: { sesion: Sesion; zona: string })
     <aside className="grid content-start gap-3.5">
       {ultima?.tareasAsignadas && (
         <section className="animate-mk-up relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#9466d9,#6534a8)] p-5 text-white [animation-delay:100ms]">
-          <LogoMark className="animate-mk-float pointer-events-none absolute -right-5 -bottom-[30px] size-[120px] opacity-[0.12]" />
+          <Ornamento n="13_loto_esencial" anim="breathe" sobre="oscuro" op={0.8} dur={8} className="-right-6 -bottom-[30px] size-[140px]" />
           <h2 className="relative flex items-center gap-2 font-sans text-[13px] font-extrabold tracking-normal text-white">
             <ListTodoIcon className="size-4" aria-hidden="true" />
             Tareas de la sesión anterior
@@ -41,7 +41,7 @@ export function ResumenPanel({ sesion, zona }: { sesion: Sesion; zona: string })
           </h2>
           <Link
             href={`/consultantes/${consultante.id}/expediente`}
-            className="text-xs font-extrabold text-deep hover:underline"
+            className="inline-flex min-h-11 items-center text-xs font-extrabold text-deep hover:underline"
           >
             Ver completo
           </Link>
@@ -95,7 +95,7 @@ export function ResumenPanel({ sesion, zona }: { sesion: Sesion; zona: string })
                 {n.citaId && (
                   <Link
                     href={`/citas/${n.citaId}/sesion`}
-                    className="mt-1 inline-block text-xs font-extrabold text-deep hover:underline"
+                    className="-my-2 inline-flex min-h-11 items-center text-xs font-extrabold text-deep hover:underline"
                   >
                     Ver nota
                   </Link>

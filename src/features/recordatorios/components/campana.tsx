@@ -31,11 +31,11 @@ export function Campana({ citas, recordatorios }: { citas: Aviso[]; recordatorio
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0">
+      <PopoverContent align="end" collisionPadding={12} className="w-[min(20rem,calc(100vw-1.5rem))] p-0">
         <div className="border-b px-4 py-3">
           <p className="font-heading font-bold">Avisos</p>
         </div>
-        <div className="max-h-96 overflow-y-auto p-2">
+        <div className="max-h-[min(24rem,calc(100dvh-11rem))] overflow-y-auto p-2">
           {total === 0 && (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">
               Todo al día. No tienes pendientes.
@@ -55,7 +55,7 @@ export function Campana({ citas, recordatorios }: { citas: Aviso[]; recordatorio
           />
         </div>
         <div className="border-t p-2">
-          <Button variant="ghost" size="sm" className="w-full" asChild>
+          <Button variant="ghost" size="sm" className="w-full max-sm:h-11" asChild>
             <Link href="/recordatorios" onClick={() => setOpen(false)}>
               Ver todos los recordatorios
             </Link>
@@ -89,7 +89,7 @@ function Grupo({
             <Link
               href={a.href}
               onClick={cerrar}
-              className="block rounded-xl px-2 py-2 transition-colors hover:bg-tint"
+              className="block rounded-xl px-2 py-3 transition-colors hover:bg-tint"
             >
               <span className="block truncate text-sm font-semibold">{a.titulo}</span>
               <span

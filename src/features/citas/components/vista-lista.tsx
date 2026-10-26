@@ -31,10 +31,10 @@ export function VistaLista({
         const delDia = citas.filter((c) => formatEnZona(c.inicio, "yyyy-MM-dd", zona) === d);
         return (
           <li key={d} className="rounded-3xl border bg-card p-4">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex min-w-0 items-center justify-between gap-2">
               <h3
                 className={cn(
-                  "font-heading font-bold",
+                  "min-w-0 font-heading font-bold",
                   d === hoy ? "text-deep" : "text-ink",
                 )}
               >
@@ -44,7 +44,7 @@ export function VistaLista({
               <Link
                 href={agendaHref({ vista, fecha, nueva: true, hora: `${d}T09:00` })}
                 scroll={false}
-                className="flex size-9 items-center justify-center rounded-full bg-tint-2 text-deep hover:bg-tint-3"
+                className="flex size-11 flex-none items-center justify-center rounded-full bg-tint-2 text-deep hover:bg-tint-3"
                 aria-label={`Agendar el ${d}`}
               >
                 <CalendarPlusIcon className="size-5" />
@@ -68,14 +68,16 @@ export function VistaLista({
                         {formatEnZona(c.inicio, "HH:mm", zona)}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="flex items-center gap-1 truncate font-semibold">
+                        <span className="flex min-w-0 items-center gap-1 font-semibold">
                           {c.modalidad === "en_linea" && (
                             <VideoIcon className="size-3.5 shrink-0" aria-label="En línea" />
                           )}
-                          {c.nombre} {c.apellidos}
+                          <span className="truncate">
+                            {c.nombre} {c.apellidos}
+                          </span>
                         </span>
                       </span>
-                      <StatusBadge tono={ESTADO_CITA_TONO[c.estado]}>
+                      <StatusBadge className="flex-none" tono={ESTADO_CITA_TONO[c.estado]}>
                         {ESTADO_CITA_LABEL[c.estado]}
                       </StatusBadge>
                     </Link>

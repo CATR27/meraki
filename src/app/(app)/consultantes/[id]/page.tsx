@@ -1,3 +1,4 @@
+import { Ornamento } from "@/components/brand/ornamento";
 import {
   HeartHandshakeIcon,
   IdCardIcon,
@@ -9,7 +10,6 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { LogoMark } from "@/components/brand/logo";
 import { obtenerConsultante, procesoDelConsultante } from "@/features/consultantes/queries";
 import { SEXO_LABEL } from "@/features/consultantes/schemas";
 import { registrarBitacora } from "@/lib/bitacora";
@@ -37,10 +37,10 @@ export default async function ConsultantePage({ params }: PageProps<"/consultant
   ];
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_340px] lg:grid-rows-[auto_1fr]">
-      <section className={cn(TARJETA, "[animation-delay:120ms] lg:col-span-2")}>
+    <div className="grid gap-5 @min-[640px]:grid-cols-2 @min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_340px] @min-[1100px]:grid-rows-[auto_1fr]">
+      <section className={cn(TARJETA, "[animation-delay:120ms] @min-[640px]:col-span-2")}>
         <Titulo icono={IdCardIcon}>Ficha de identificación</Titulo>
-        <dl className="grid gap-x-6 gap-y-[18px] sm:grid-cols-2 xl:grid-cols-3">
+        <dl className="grid gap-x-6 gap-y-[18px] @min-[520px]:grid-cols-2 @min-[900px]:grid-cols-3">
           {identificacion.map(([etiqueta, valor]) => (
             <Dato key={etiqueta} etiqueta={etiqueta} valor={valor} />
           ))}
@@ -56,7 +56,7 @@ export default async function ConsultantePage({ params }: PageProps<"/consultant
             etiqueta="Teléfono"
             valor={
               c.telefono && (
-                <a href={`tel:${c.telefono}`} className="text-deep hover:underline">
+                <a href={`tel:${c.telefono}`} className="inline-flex min-h-11 items-center text-deep hover:underline">
                   {c.telefono}
                 </a>
               )
@@ -66,7 +66,7 @@ export default async function ConsultantePage({ params }: PageProps<"/consultant
             etiqueta="Correo"
             valor={
               c.email && (
-                <a href={`mailto:${c.email}`} className="break-all text-deep hover:underline">
+                <a href={`mailto:${c.email}`} className="inline-flex min-h-11 items-center break-all text-deep hover:underline">
                   {c.email}
                 </a>
               )
@@ -77,7 +77,7 @@ export default async function ConsultantePage({ params }: PageProps<"/consultant
         </dl>
       </section>
 
-      <div className="grid content-start gap-[18px]">
+      <div className="grid content-start gap-[18px] @min-[640px]:col-span-2 @min-[640px]:grid-cols-2 @min-[1100px]:col-span-1 @min-[1100px]:grid-cols-1">
         <section className="animate-mk-up rounded-3xl border bg-destructive-soft px-6 py-[22px] [animation-delay:300ms]">
           <h2 className="mb-2.5 flex items-center gap-2.5 text-[17px] font-bold">
             <HeartHandshakeIcon className="size-[18px] text-destructive" aria-hidden="true" />
@@ -97,7 +97,7 @@ export default async function ConsultantePage({ params }: PageProps<"/consultant
               {c.contactoEmergenciaTelefono && (
                 <a
                   href={`tel:${c.contactoEmergenciaTelefono}`}
-                  className="mt-1 block font-bold text-destructive hover:underline"
+                  className="mt-1 flex min-h-11 items-center font-bold text-destructive hover:underline"
                 >
                   {c.contactoEmergenciaTelefono}
                 </a>
@@ -175,8 +175,8 @@ function SuProceso({
 }) {
   const ultimo = proceso.animo.length - 1;
   return (
-    <section className="animate-mk-up relative flex flex-col overflow-hidden rounded-3xl border bg-tint p-6 [animation-delay:180ms] lg:row-span-2">
-      <LogoMark className="animate-mk-float pointer-events-none absolute -top-[30px] -right-10 size-[170px] text-lavanda-300 opacity-25" />
+    <section className="animate-mk-up relative flex flex-col overflow-hidden rounded-3xl border bg-tint p-6 [animation-delay:180ms] @min-[1100px]:row-span-2">
+      <Ornamento n="15_brote_crecimiento" anim="sway" op={0.9} dur={12} className="-top-5 -right-[30px] size-[180px]" />
       <p className="relative text-xs font-extrabold tracking-[0.12em] text-muted-foreground uppercase">
         Su proceso
       </p>
@@ -199,7 +199,7 @@ function SuProceso({
           : "Se mostrará al registrar el ánimo en una sesión."}
       </p>
       {proceso.animo.length > 0 && (
-        <div className="relative flex min-h-[150px] flex-1 items-end gap-2.5">
+        <div className="relative flex min-h-[150px] flex-1 items-end gap-1.5 @min-[640px]:gap-2.5">
           {proceso.animo.map((a, i) => (
             <div
               key={a.numero}

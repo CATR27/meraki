@@ -25,7 +25,7 @@ export function UserMenu({ name, email, roleLabel }: UserMenuProps) {
         <span className="flex size-9 items-center justify-center rounded-avatar bg-gradient-to-br from-lavanda-300 to-lavanda-500 font-heading text-sm font-bold text-white">
           {iniciales(name)}
         </span>
-        <span className="hidden text-left leading-[1.15] sm:grid">
+        <span className="hidden text-left leading-[1.15] min-[768px]:grid">
           <span className="text-sm font-bold text-ink">{name}</span>
           <span className="text-xs text-muted-foreground">{roleLabel}</span>
         </span>

@@ -7,17 +7,18 @@ const CIRCUNFERENCIA = 113.1; // 2·π·18
 
 function leerInicio(clave: string): number {
   try {
-    const guardado = Number(sessionStorage.getItem(clave));
-    if (guardado > 0) return guardado;
+    const guardado = Number(localStorage.getItem(clave));
+    // Un inicio de hace más de 12 h es de otro día: se empieza de nuevo.
+    if (guardado > 0 && Date.now() - guardado < 12 * 3600_000) return guardado;
     const ahora = Date.now();
-    sessionStorage.setItem(clave, String(ahora));
+    localStorage.setItem(clave, String(ahora));
     return ahora;
   } catch {
     return Date.now();
   }
 }
 
-/** Tiempo transcurrido de la sesión en un anillo; sobrevive a recargas de la pestaña. */
+/** Tiempo transcurrido de la sesión en un anillo; sobrevive a recargas y a cierres de la app. */
 export function Cronometro({ citaId, duracionMin }: { citaId: string; duracionMin: number }) {
   const [transcurrido, setTranscurrido] = useState<number | null>(null);
 
@@ -37,10 +38,10 @@ export function Cronometro({ citaId, duracionMin }: { citaId: string; duracionMi
 
   return (
     <div
-      className="flex items-center gap-3 rounded-full bg-tint py-1.5 pr-[18px] pl-1.5"
+      className="flex items-center gap-2 rounded-full bg-tint py-1 pr-3.5 pl-1 @min-[600px]:gap-3 @min-[600px]:py-1.5 @min-[600px]:pr-[18px] @min-[600px]:pl-1.5"
       title={`Duración planeada: ${duracionMin} min`}
     >
-      <svg viewBox="0 0 44 44" aria-hidden="true" className="size-11 -rotate-90">
+      <svg viewBox="0 0 44 44" aria-hidden="true" className="size-9 -rotate-90 @min-[600px]:size-11">
         <circle cx="22" cy="22" r="18" fill="none" stroke="var(--tint-3)" strokeWidth="4" />
         <circle
           cx="22"
@@ -59,13 +60,13 @@ export function Cronometro({ citaId, duracionMin }: { citaId: string; duracionMi
         <span
           aria-label="Tiempo de sesión"
           className={cn(
-            "font-heading text-2xl font-bold tabular-nums",
+            "font-heading text-lg font-bold tabular-nums @min-[600px]:text-2xl",
             excedido ? "text-warning" : "text-ink",
           )}
         >
           {transcurrido === null ? "--:--" : `${mm}:${ss}`}
         </span>
-        <span className="text-xs text-muted-foreground">de {duracionMin} min</span>
+        <span className="hidden text-xs text-muted-foreground @min-[600px]:block">de {duracionMin} min</span>
       </span>
     </div>
   );

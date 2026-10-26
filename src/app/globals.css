@@ -36,6 +36,8 @@
   --color-deep: var(--deep);
   --color-ink: var(--ink);
   --color-soft-foreground: var(--soft-foreground);
+  --color-sb1: var(--sb1);
+  --color-sb2: var(--sb2);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -119,6 +121,11 @@
   --sidebar-accent-foreground: var(--color-lavanda-800);
   --sidebar-border: #e6dcf5;
   --sidebar-ring: var(--color-lavanda-500);
+  --orn-blend: multiply;
+  --orn-op: 0.78;
+  --orn-glow: mk-glow-l;
+  --sb1: #5a2f96;
+  --sb2: #24133f;
 }
 
 .dark {
@@ -160,6 +167,11 @@
   --sidebar-accent-foreground: var(--color-lavanda-100);
   --sidebar-border: #33264c;
   --sidebar-ring: var(--color-lavanda-400);
+  --orn-blend: screen;
+  --orn-op: 0.9;
+  --orn-glow: mk-glow-d;
+  --sb1: #2f2149;
+  --sb2: #110a1b;
 }
 
 @layer base {
@@ -222,6 +234,38 @@
   0%, 100% { transform: rotate(var(--a)) translateY(0); }
   50% { transform: rotate(var(--a)) translateY(-6px); }
 }
+@keyframes mk-pulse-claro {
+  0% { box-shadow: 0 0 0 0 rgba(201, 174, 240, 0.55); }
+  70%, 100% { box-shadow: 0 0 0 10px rgba(201, 174, 240, 0); }
+}
+@keyframes mk-ripple {
+  from { transform: scale(0.5); opacity: 0.6; }
+  to { transform: scale(2.3); opacity: 0; }
+}
+@keyframes mk-drift {
+  0%, 100% { transform: translate(0, 0) rotate(var(--r)); }
+  50% { transform: translate(16px, -24px) rotate(calc(var(--r) + 24deg)); }
+}
+@keyframes mk-soft {
+  0%, 100% { transform: scale(0.97); }
+  50% { transform: scale(1.03); }
+}
+@keyframes mk-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes mk-orn-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg) translateY(-6px); }
+}
+@keyframes mk-glow-d {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(201, 174, 240, 0.35)) brightness(1); }
+  50% { filter: drop-shadow(0 0 28px rgba(224, 208, 247, 0.85)) brightness(1.18); }
+}
+@keyframes mk-glow-l {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgba(101, 52, 168, 0.12)) saturate(1.05); }
+  50% { filter: drop-shadow(0 14px 26px rgba(101, 52, 168, 0.26)) saturate(1.25); }
+}
 @keyframes mk-blink {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
@@ -236,6 +280,10 @@
 @utility animate-mk-spin { animation: mk-spin 30s linear infinite; }
 @utility animate-mk-grow { animation: mk-grow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; transform-origin: bottom; }
 @utility animate-mk-sway { animation: mk-sway 7s ease-in-out infinite; }
+@utility animate-mk-pulse-claro { animation: mk-pulse-claro 2.4s infinite; }
+@utility animate-mk-ripple { animation: mk-ripple 3.2s ease-out infinite; }
+@utility animate-mk-drift { animation: mk-drift 14s ease-in-out infinite; }
+@utility animate-mk-soft { animation: mk-soft 6s ease-in-out infinite; }
 @utility animate-mk-blink { animation: mk-blink 1.1s steps(1) infinite; }
 
 /* Formas del rediseño: hoja y avatar */
@@ -247,5 +295,84 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Margen superior seguro. En iOS la barra de estado es sólida (sin translucent), así que env() ya vale 0 y solo
+   se deja un colchón; en Android, el contenido llega hasta el borde y se reserva un mínimo. */
+:root {
+  --mk-top: env(safe-area-inset-top, 0px);
+}
+@media (display-mode: standalone) {
+  :root {
+    --mk-top: max(env(safe-area-inset-top, 0px), 8px);
+  }
+}
+@supports not (-webkit-touch-callout: none) {
+  @media (display-mode: standalone) {
+    :root {
+      --mk-top: max(env(safe-area-inset-top, 0px), 52px);
+    }
+  }
+}
+@media (display-mode: standalone) and (min-width: 768px) {
+  :root {
+    --mk-top: 0px;
+  }
+}
+
+/* Sin zoom por doble toque ni por ajuste de texto: la app se comporta como una app nativa. */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Brillo de la marca de agua del acceso: sigue al ratón o recorre la palabra en pantallas táctiles. */
+@property --ax { syntax: "<percentage>"; inherits: false; initial-value: 14%; }
+@property --ay { syntax: "<percentage>"; inherits: false; initial-value: 35%; }
+@property --bx { syntax: "<percentage>"; inherits: false; initial-value: 86%; }
+@property --by { syntax: "<percentage>"; inherits: false; initial-value: 62%; }
+@keyframes mk-destello-a {
+  0% { --ax: 10%; --ay: 30%; }
+  30% { --ax: 40%; --ay: 72%; }
+  65% { --ax: 70%; --ay: 28%; }
+  100% { --ax: 10%; --ay: 30%; }
+}
+@keyframes mk-destello-b {
+  0% { --bx: 90%; --by: 68%; }
+  50% { --bx: 28%; --by: 24%; }
+  100% { --bx: 90%; --by: 68%; }
+}
+.mk-marca-brillo {
+  color: transparent;
+  background-image:
+    radial-gradient(circle at var(--ax) var(--ay), rgba(244, 236, 255, 0.95) 0, rgba(201, 174, 240, 0.55) 9%, transparent 24%),
+    radial-gradient(circle at var(--bx) var(--by), rgba(244, 236, 255, 0.85) 0, rgba(201, 174, 240, 0.45) 8%, transparent 22%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 22px rgba(201, 174, 240, 0.55));
+  animation:
+    mk-destello-a 9s ease-in-out infinite,
+    mk-destello-b 13s ease-in-out infinite;
+}
+.mk-marca-brillo[data-toque] {
+  animation: none;
+  background-image: radial-gradient(circle 190px at var(--x, 50%) var(--y, 50%), rgba(244, 236, 255, 0.98) 0, rgba(201, 174, 240, 0.6) 45%, transparent 100%);
+}
+@media (hover: hover) and (pointer: fine) {
+  .mk-marca-brillo {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    background-image: radial-gradient(circle 230px at var(--x, 50%) var(--y, 50%), rgba(244, 236, 255, 0.98) 0, rgba(201, 174, 240, 0.6) 45%, transparent 100%);
+  }
+  .mk-marca-brillo[data-sigue] {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-marca-brillo {
+    animation: none;
   }
 }

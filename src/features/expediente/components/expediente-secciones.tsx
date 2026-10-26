@@ -39,7 +39,7 @@ export function ExpedienteSecciones({ consultanteId, valores }: Props) {
                 <span
                   className={`flex size-[38px] shrink-0 items-center justify-center rounded-leaf font-heading font-bold ${
                     completa ? "bg-success text-white" : "bg-tint-2 text-deep"
-                  }`}
+                  } group-aria-expanded/accordion-trigger:bg-primary group-aria-expanded/accordion-trigger:text-primary-foreground`}
                 >
                   {i + 1}
                 </span>
@@ -57,7 +57,7 @@ export function ExpedienteSecciones({ consultanteId, valores }: Props) {
                 </StatusBadge>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pb-6">
+            <AccordionContent className="pb-6 @min-[640px]:pl-[54px]">
               <SeccionForm consultanteId={consultanteId} seccion={s} valores={valores} />
             </AccordionContent>
           </AccordionItem>

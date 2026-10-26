@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheckIcon, CircleDotIcon } from "lucide-react";
+import { CheckIcon, CircleCheckIcon, CircleDotIcon } from "lucide-react";
 import { useActionState, useState } from "react";
 import { Field } from "@/components/shared/form-field";
 import { FormMessage } from "@/components/shared/form-message";
@@ -44,26 +44,26 @@ export function SeccionForm({ consultanteId, seccion, valores }: Props) {
           <Textarea
             name={campo}
             defaultValue={v(campo)}
-            className="min-h-28 leading-relaxed"
+            className="min-h-28 rounded-[18px] leading-relaxed placeholder-shown:bg-tint focus-visible:bg-card"
             maxLength={20_000}
           />
         </Field>
       ))}
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <span aria-live="polite" className="text-sm">
+      <div className="flex flex-wrap items-center gap-3.5">
+        <SubmitButton pendingText="Guardando…">
+          <CheckIcon aria-hidden="true" /> Guardar sección
+        </SubmitButton>
+        <span aria-live="polite" className="text-[13px]">
           {sucio ? (
             <span className="inline-flex items-center gap-1.5 font-semibold text-warning">
               <CircleDotIcon className="size-4" aria-hidden="true" /> Cambios sin guardar
             </span>
           ) : state?.ok ? (
             <span className="inline-flex items-center gap-1.5 font-semibold text-success">
-              <CircleCheckIcon className="size-4" aria-hidden="true" /> Guardado
+              <CircleCheckIcon className="size-[15px]" aria-hidden="true" /> Guardado hace un momento
             </span>
           ) : null}
         </span>
-        <SubmitButton variant={sucio ? "default" : "outline"} pendingText="Guardando…">
-          Guardar sección
-        </SubmitButton>
       </div>
     </form>
   );

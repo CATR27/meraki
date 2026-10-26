@@ -56,7 +56,7 @@ export function CamposProfesionales({ v, err, descripcion }: CamposProps) {
           id="direccionConsultorio"
           label="Dirección del consultorio"
           error={err?.direccionConsultorio}
-          className="sm:col-span-2"
+          className="@min-[560px]:col-span-2"
         >
           <Input name="direccionConsultorio" defaultValue={v("direccionConsultorio")} />
         </Field>
@@ -91,7 +91,7 @@ export function CamposProfesionales({ v, err, descripcion }: CamposProps) {
           label="Zona horaria"
           required
           error={err?.zonaHoraria}
-          className="sm:col-span-2"
+          className="@min-[560px]:col-span-2"
         >
           <NativeSelect name="zonaHoraria" defaultValue={v("zonaHoraria") || DEFAULT_TZ}>
             {ZONAS_HORARIAS.map((z) => (

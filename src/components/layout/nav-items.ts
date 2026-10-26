@@ -29,7 +29,7 @@ export const NAV_GROUPS: Record<Rol, NavGroup[]> = {
         { href: "/panel", label: "Inicio", icon: HouseIcon },
         { href: "/agenda", label: "Agenda", icon: CalendarDaysIcon },
         { href: "/consultantes", label: "Consultantes", icon: UsersRoundIcon, corto: "Personas" },
-        { href: "/recordatorios", label: "Recordatorios", icon: BellRingIcon, corto: "Pendientes" },
+        { href: "/recordatorios", label: "Recordatorios", icon: BellRingIcon, corto: "Avisos" },
       ],
     },
     {

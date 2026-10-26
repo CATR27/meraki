@@ -1,7 +1,9 @@
 import { KeyRoundIcon } from "lucide-react";
 import type { Metadata } from "next";
+import { Ornamento } from "@/components/brand/ornamento";
 import { CambiarContrasenaForm } from "@/features/auth/components/cambiar-contrasena-form";
 import { PerfilForm } from "@/features/perfil/components/perfil-form";
+import { TarjetaInstalar } from "@/features/pwa/components/tarjeta-instalar";
 import { SelectorTema } from "@/features/perfil/components/selector-tema";
 import { estadisticasDelPerfil, obtenerMiPerfil } from "@/features/perfil/queries";
 import { iniciales } from "@/lib/format";
@@ -33,9 +35,10 @@ export default async function PerfilPage() {
     : [];
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-      <aside className="grid gap-6 lg:sticky lg:top-24">
-        <section className="animate-mk-up grid justify-items-center gap-4 rounded-3xl border bg-card px-6 py-8 text-center [animation-delay:60ms]">
+    <div className="grid items-start gap-6 @min-[900px]:grid-cols-[340px_minmax(0,1fr)]">
+      <aside className="grid gap-6 @min-[900px]:sticky @min-[900px]:top-0">
+        <section className="animate-mk-up relative isolate grid justify-items-center gap-4 overflow-hidden rounded-3xl border bg-card px-6 py-8 text-center [animation-delay:60ms]">
+          <Ornamento n="12_amanecer" anim="breathe" op={0.4} dur={10} className="-top-[70px] -right-[70px] -z-10 size-[220px]" />
           <div className="relative size-[104px]">
             <span
               aria-hidden="true"
@@ -67,12 +70,13 @@ export default async function PerfilPage() {
         <section className="animate-mk-up grid gap-1 rounded-3xl border bg-card px-6 py-5 [animation-delay:240ms]">
           <h2 className="mb-2 text-xl font-bold">Preferencias</h2>
           <SelectorTema />
+          <TarjetaInstalar />
         </section>
       </aside>
 
       <div className="min-w-0">
         <div className="animate-mk-up mb-6">
-          <h2 className="text-3xl font-bold tracking-[-0.02em] sm:text-[34px]">
+          <h2 className="text-[34px] font-bold tracking-[-0.02em]">
             {esPsicologo ? "Mi perfil" : "Mi cuenta"}
           </h2>
           <p className="mt-1 text-muted-foreground">
@@ -82,7 +86,7 @@ export default async function PerfilPage() {
 
         <PerfilForm rol={rol} defaults={datos} />
 
-        <section className="animate-mk-up grid max-w-2xl gap-4 rounded-3xl border bg-card px-6 py-6 sm:px-7">
+        <section className="animate-mk-up grid max-w-2xl gap-4 rounded-3xl border bg-card px-6 py-6 @min-[640px]:px-7">
           <div>
             <h2 className="flex items-center gap-2.5 text-xl font-bold">
               <KeyRoundIcon className="size-5 text-lavanda-500" aria-hidden="true" />

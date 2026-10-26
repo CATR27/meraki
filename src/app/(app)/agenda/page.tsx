@@ -74,7 +74,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/agenda">)
         <VistaMes fecha={fecha} dias={dias} citas={citas} zona={zona} hoy={hoy} />
       ) : (
         <>
-          <div className="hidden md:block">
+          <div className="hidden @min-[760px]:block">
             <VistaSemana
               vista={vista}
               fecha={fecha}
@@ -85,7 +85,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/agenda">)
               ahora={new Date()}
             />
           </div>
-          <div className="md:hidden">
+          <div className="@min-[760px]:hidden">
             <VistaLista
               vista={vista}
               fecha={fecha}
@@ -98,7 +98,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/agenda">)
         </>
       )}
 
-      <ul className="animate-mk-up mt-5 flex flex-wrap gap-x-[18px] gap-y-2 text-[13px] text-muted-foreground [animation-delay:200ms]">
+      <ul className="animate-mk-up mt-6 flex flex-wrap gap-x-[18px] gap-y-2 text-[13px] text-muted-foreground [animation-delay:200ms]">
         {LEYENDA.map((e) => (
           <li key={e} className="inline-flex items-center gap-2 font-semibold">
             <span

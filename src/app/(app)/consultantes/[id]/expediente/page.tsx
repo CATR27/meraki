@@ -1,5 +1,6 @@
 import { LockKeyholeIcon } from "lucide-react";
 import type { Metadata } from "next";
+import { Ornamento } from "@/components/brand/ornamento";
 import { ExpedienteSecciones } from "@/features/expediente/components/expediente-secciones";
 import { obtenerExpediente } from "@/features/expediente/queries";
 import { SECCIONES_EXPEDIENTE } from "@/features/expediente/secciones";
@@ -45,8 +46,9 @@ export default async function ExpedientePage({
   } as const;
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[300px_minmax(0,1fr)]">
-      <aside className="animate-mk-up order-first grid h-fit gap-4 rounded-3xl border bg-card px-6 py-[26px] text-center [animation-delay:100ms] xl:sticky xl:top-24 xl:order-none">
+    <div className="grid items-start gap-5 @min-[860px]:grid-cols-[300px_minmax(0,1fr)]">
+      <aside className="animate-mk-up relative isolate order-first grid h-fit overflow-hidden gap-4 rounded-3xl border bg-card px-6 py-[26px] text-center [animation-delay:100ms] @min-[860px]:sticky @min-[860px]:top-0 @min-[860px]:order-none">
+        <Ornamento n="04_loto_orbita" anim="spin" op={0.55} dur={15} className="top-2.5 left-1/2 -z-10 -ml-[110px] size-[220px]" />
         <div>
           <p className="text-xs font-extrabold tracking-[0.12em] text-muted-foreground uppercase">
             Historia clínica
