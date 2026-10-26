@@ -4,10 +4,12 @@ import { and, count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { citas, notasSesion } from "@/db/schema";
+import { citas, notasSesion, notasSesionVersiones, type ORIGENES_VERSION } from "@/db/schema";
 import { registrarBitacora } from "@/lib/bitacora";
 import { requireRole } from "@/lib/dal";
-import { type NotaDatos, type NotaInput, notaSchema, validarCierre } from "./schemas";
+import { type NotaDatos, type NotaInput, notaSchema } from "./schemas";
+
+type OrigenVersion = (typeof ORIGENES_VERSION)[number];
 
 export type ResultadoGuardado =
   | { ok: true; guardadoEn: number }
@@ -95,9 +97,7 @@ export async function finalizarSesion(
   const parsed = notaSchema.safeParse(entrada);
   if (!parsed.success) return { ok: false, message: "Revisa los datos de la nota." };
 
-  const error = validarCierre(parsed.data);
-  if (error) return { ok: false, message: error };
-
+  // Se permite finalizar sin S/O/A/P: la nota queda "por completar" y se edita después.
   const resultado = await guardarNota(user.id, citaId, parsed.data, true);
   if (!resultado.ok) return resultado;
 
@@ -105,4 +105,79 @@ export async function finalizarSesion(
   revalidatePath("/panel");
   revalidatePath(`/consultantes/${resultado.consultanteId}`, "layout");
   redirect(`/consultantes/${resultado.consultanteId}/sesiones`);
+}
+
+const CAMPOS_VERSIONADOS = [
+  "subjetivo",
+  "objetivo",
+  "analisis",
+  "plan",
+  "estadoAnimo",
+  "nivelRiesgo",
+  "tareasAsignadas",
+  "observaciones",
+] as const;
+
+/**
+ * Reemplaza el contenido de una nota cerrada. La versión vigente pasa antes al
+ * historial (notas_sesion_versiones) para conservar la trazabilidad del registro clínico.
+ */
+async function reemplazarNotaCerrada(
+  psicologoId: string,
+  citaId: string,
+  datos: NotaDatos,
+  origen: OrigenVersion,
+): Promise<ResultadoGuardado & { consultanteId?: string }> {
+  const [nota] = await db
+    .select()
+    .from(notasSesion)
+    .where(and(eq(notasSesion.citaId, citaId), eq(notasSesion.psicologoId, psicologoId)))
+    .limit(1);
+  if (!nota) return { ok: false, message: "La nota no existe." };
+  if (nota.estado !== "cerrada") return { ok: false, message: "La sesión aún no se finaliza." };
+
+  const sinCambios = CAMPOS_VERSIONADOS.every((c) => (nota[c] ?? null) === (datos[c] ?? null));
+  if (sinCambios) return { ok: true, guardadoEn: Date.now(), consultanteId: nota.consultanteId };
+
+  try {
+    await db.transaction(async (tx) => {
+      await tx.insert(notasSesionVersiones).values({
+        ...Object.fromEntries(CAMPOS_VERSIONADOS.map((c) => [c, nota[c]])),
+        nivelRiesgo: nota.nivelRiesgo,
+        notaId: nota.id,
+        version: nota.version,
+        origen,
+        editadoPor: psicologoId,
+      });
+      await tx
+        .update(notasSesion)
+        .set({ ...datos, version: nota.version + 1, editadaAt: new Date() })
+        .where(eq(notasSesion.id, nota.id));
+    });
+  } catch (error) {
+    // El índice único (nota, versión) frena dos ediciones simultáneas de la misma versión.
+    console.error("[nota]", error instanceof Error ? error.message : error);
+    return { ok: false, message: "La nota cambió mientras la editabas. Recarga e inténtalo de nuevo." };
+  }
+
+  registrarBitacora(psicologoId, "editar", "nota", nota.id);
+  return { ok: true, guardadoEn: Date.now(), consultanteId: nota.consultanteId };
+}
+
+/** Edición de una nota ya finalizada (queda registrada en el historial). */
+export async function editarNotaCerrada(
+  citaId: string,
+  entrada: NotaInput,
+): Promise<ResultadoGuardado> {
+  const user = await requireRole("psicologo");
+  const parsed = notaSchema.safeParse(entrada);
+  if (!parsed.success) return { ok: false, message: "Revisa los datos de la nota." };
+
+  const r = await reemplazarNotaCerrada(user.id, citaId, parsed.data, "manual");
+  if (!r.ok) return r;
+
+  revalidatePath("/panel");
+  revalidatePath(`/citas/${citaId}/sesion`);
+  revalidatePath(`/consultantes/${r.consultanteId}`, "layout");
+  return { ok: true, guardadoEn: r.guardadoEn };
 }

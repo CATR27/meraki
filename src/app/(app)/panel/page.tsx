@@ -41,6 +41,10 @@ const TONO_BADGE = {
 const HORA_INI = 8;
 const HORA_FIN = 18;
 
+/** Un borrador se continúa en modo sesión; una nota finalizada vacía se completa editándola. */
+const notaHref = (n: { citaId: string | null; estado: string }) =>
+  `/citas/${n.citaId}/sesion${n.estado === "cerrada" ? "?editar=1" : ""}`;
+
 const posicion = (fecha: Date, zona: string) => {
   const [h, m] = formatEnZona(fecha, "H:m", zona).split(":").map(Number);
   return Math.min(100, Math.max(0, ((h + m / 60 - HORA_INI) / (HORA_FIN - HORA_INI)) * 100));
@@ -229,8 +233,8 @@ export default async function PanelPage() {
         <Indicador
           icono={FilePenLineIcon}
           valor={r.totalBorradores}
-          etiqueta="Notas por cerrar"
-          href={r.borradores[0] ? `/citas/${r.borradores[0].citaId}/sesion` : undefined}
+          etiqueta="Notas pendientes"
+          href={r.borradores[0] ? notaHref(r.borradores[0]) : undefined}
           alerta
           retraso={220}
         />
@@ -380,26 +384,27 @@ export default async function PanelPage() {
           <section className="animate-mk-up rounded-3xl border border-warning-border bg-warning-soft p-[22px] [animation-delay:420ms]">
             <h2 className="mb-1 flex items-center gap-2 text-lg font-bold">
               <FilePenLineIcon className="size-[18px] text-warning" aria-hidden="true" />
-              Notas por cerrar
+              Notas pendientes
             </h2>
             <p className="mb-3 text-[13px] text-muted-foreground">
-              Sesiones con borrador que aún no finalizas.
+              Borradores sin finalizar y sesiones finalizadas sin nota.
             </p>
             {r.borradores.length === 0 ? (
               <p className="rounded-2xl bg-card px-3.5 py-3 text-sm text-muted-foreground">
-                Todo al día: no tienes borradores.
+                Todo al día: no tienes notas pendientes.
               </p>
             ) : (
               <ul className="grid gap-2">
                 {r.borradores.map((b) => (
                   <li key={b.id}>
                     <Link
-                      href={`/citas/${b.citaId}/sesion`}
+                      href={notaHref(b)}
                       className="flex flex-wrap justify-between gap-x-2 gap-y-1 rounded-2xl bg-card px-3.5 py-3 text-sm transition-colors hover:bg-tint"
                     >
                       <span className="font-bold text-foreground">{nombreCompleto(b)}</span>
                       <span className="text-xs text-muted-foreground">
-                        Sesión {b.numeroSesion} · {formatEnZona(b.fecha, "d MMM", r.zona)}
+                        {b.estado === "borrador" ? "Borrador" : "Por completar"} · Sesión{" "}
+                        {b.numeroSesion} · {formatEnZona(b.fecha, "d MMM", r.zona)}
                       </span>
                     </Link>
                   </li>

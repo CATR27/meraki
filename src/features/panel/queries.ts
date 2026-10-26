@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { consultantes, expedientes, notasSesion } from "@/db/schema";
 import { listarCitasRango } from "@/features/citas/queries";
 import { avisosPendientes } from "@/features/recordatorios/queries";
+import { notaPendiente } from "@/features/sesiones/queries";
 import { rangoVista } from "@/lib/agenda";
 import { requireRole } from "@/lib/dal";
 import { formatEnZona, hoyISO } from "@/lib/dates";
@@ -30,19 +31,20 @@ export async function resumenDelDia() {
     db
       .select({ totalBorradores: count() })
       .from(notasSesion)
-      .where(and(eq(notasSesion.psicologoId, user.id), eq(notasSesion.estado, "borrador"))),
+      .where(and(eq(notasSesion.psicologoId, user.id), notaPendiente)),
     db
       .select({
         id: notasSesion.id,
         citaId: notasSesion.citaId,
         fecha: notasSesion.fecha,
         numeroSesion: notasSesion.numeroSesion,
+        estado: notasSesion.estado,
         nombre: consultantes.nombre,
         apellidos: consultantes.apellidos,
       })
       .from(notasSesion)
       .innerJoin(consultantes, eq(consultantes.id, notasSesion.consultanteId))
-      .where(and(eq(notasSesion.psicologoId, user.id), eq(notasSesion.estado, "borrador")))
+      .where(and(eq(notasSesion.psicologoId, user.id), notaPendiente))
       .orderBy(desc(notasSesion.fecha))
       .limit(5),
     avisosPendientes(),

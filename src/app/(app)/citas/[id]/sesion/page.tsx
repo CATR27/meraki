@@ -12,7 +12,7 @@ import { ExpedienteSheet } from "@/features/sesiones/components/expediente-sheet
 import { NotaLectura } from "@/features/sesiones/components/nota-lectura";
 import { NotaSesionForm, type ValoresNota } from "@/features/sesiones/components/nota-sesion-form";
 import { ResumenPanel } from "@/features/sesiones/components/resumen-panel";
-import { obtenerSesion } from "@/features/sesiones/queries";
+import { historialDeNota, obtenerSesion } from "@/features/sesiones/queries";
 import { aLocal } from "@/lib/agenda";
 import { registrarBitacora } from "@/lib/bitacora";
 import { requireRole } from "@/lib/dal";
@@ -21,14 +21,18 @@ import { iniciales, nombreCompleto } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Sesión" };
 
-export default async function SesionPage({ params }: PageProps<"/citas/[id]/sesion">) {
-  const { id } = await params;
+export default async function SesionPage({
+  params,
+  searchParams,
+}: PageProps<"/citas/[id]/sesion">) {
+  const [{ id }, { editar }] = await Promise.all([params, searchParams]);
   const [user, sesion] = await Promise.all([requireRole("psicologo"), obtenerSesion(id)]);
   const { cita, consultante, expediente, nota } = sesion;
   const zona = user.zonaHoraria;
   if (nota) registrarBitacora(user.id, "ver", "nota", nota.id);
 
   const cerrada = nota?.estado === "cerrada";
+  const editando = cerrada && editar === "1";
   const cancelada = cita.estado === "cancelada";
   const duracion = Math.round((cita.fin.getTime() - cita.inicio.getTime()) / 60_000);
   const numero = nota?.numeroSesion;
@@ -106,10 +110,12 @@ export default async function SesionPage({ params }: PageProps<"/citas/[id]/sesi
     </>
   );
 
-  if (!cerrada && !cancelada) {
+  if ((!cerrada && !cancelada) || editando) {
     return (
       <NotaSesionForm
+        key={editando ? "edicion" : "sesion"}
         citaId={cita.id}
+        modo={editando ? "edicion" : "sesion"}
         inicial={inicial}
         contactoEmergencia={{
           nombre: consultante.contactoEmergenciaNombre,
@@ -123,13 +129,15 @@ export default async function SesionPage({ params }: PageProps<"/citas/[id]/sesi
     );
   }
 
+  const historial = cerrada && nota ? await historialDeNota(nota.id) : [];
+
   return (
     <div className="grid gap-6">
       <CabeceraSesion izquierda={izquierda} acciones={acciones} />
       <div className="grid gap-6 @min-[900px]:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
           {cerrada && nota ? (
-            <NotaLectura nota={nota} zona={zona} />
+            <NotaLectura nota={nota} historial={historial} zona={zona} />
           ) : (
             <div className="rounded-3xl border bg-card p-6">
               <StatusBadge tono="neutral">Cita cancelada</StatusBadge>

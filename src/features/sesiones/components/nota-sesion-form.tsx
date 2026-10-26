@@ -4,10 +4,14 @@ import {
   CircleAlertIcon,
   CircleCheckIcon,
   CloudUploadIcon,
+  HistoryIcon,
   LockKeyholeIcon,
   PhoneIcon,
+  SaveIcon,
   TriangleAlertIcon,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Ornamento } from "@/components/brand/ornamento";
 import { type ReactNode, useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -28,8 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { NIVELES_RIESGO } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { CabeceraSesion } from "./cabecera-sesion";
-import { finalizarSesion, guardarBorradorNota } from "../actions";
-import { CAMPOS_SOAP, type NivelRiesgo, RIESGO_LABEL } from "../schemas";
+import { editarNotaCerrada, finalizarSesion, guardarBorradorNota } from "../actions";
+import { apartadosVacios, CAMPOS_SOAP, type NivelRiesgo, RIESGO_LABEL } from "../schemas";
 
 export type ValoresNota = {
   subjetivo: string;
@@ -60,6 +64,8 @@ const RIESGO_ESTILO: Record<NivelRiesgo, string> = {
 
 type Props = {
   citaId: string;
+  /** "sesion": borrador con autoguardado. "edicion": nota ya cerrada, se guarda al confirmar. */
+  modo?: "sesion" | "edicion";
   inicial: ValoresNota;
   contactoEmergencia: { nombre: string | null; parentesco: string | null; telefono: string | null };
   /** Identidad del consultante en la tarjeta superior (renderizada en el servidor). */
@@ -72,12 +78,15 @@ type Props = {
 
 export function NotaSesionForm({
   citaId,
+  modo = "sesion",
   inicial,
   contactoEmergencia,
   cabeceraIzquierda,
   cabeceraAcciones,
   lateral,
 }: Props) {
+  const router = useRouter();
+  const edicion = modo === "edicion";
   const [valores, setValores] = useState(inicial);
   const [estado, setEstado] = useState<Estado>({ tipo: "inicial" });
   const [finalizando, startFinalizar] = useTransition();
@@ -120,6 +129,8 @@ export function NotaSesionForm({
     valoresRef.current = nuevos;
     setValores(nuevos);
     setEstado({ tipo: "sucio" });
+    // En edición no hay autoguardado: cada guardado crea una versión en el historial.
+    if (edicion) return;
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => void guardar(), RETRASO_MS);
   }
@@ -157,7 +168,25 @@ export function NotaSesionForm({
     });
   }
 
+  function guardarEdicion() {
+    startFinalizar(async () => {
+      try {
+        const res = await editarNotaCerrada(citaId, valoresRef.current);
+        if (!res.ok) {
+          setEstado({ tipo: "error", mensaje: res.message });
+          return;
+        }
+        setEstado({ tipo: "guardado", en: res.guardadoEn });
+        toast.success("Nota actualizada. La versión anterior quedó en el historial.");
+        router.push(`/citas/${citaId}/sesion`);
+      } catch {
+        setEstado({ tipo: "error", mensaje: "Sin conexión con el servidor." });
+      }
+    });
+  }
+
   const riesgoAlto = valores.nivelRiesgo === "medio" || valores.nivelRiesgo === "alto";
+  const faltantes = apartadosVacios(valores);
 
   const finalizarBoton = (
     <AlertDialog>
@@ -168,17 +197,36 @@ export function NotaSesionForm({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Finalizar la sesión?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {faltantes.length > 0 ? "Faltan apartados por llenar" : "¿Finalizar la sesión?"}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            La nota quedará cerrada y ya no podrá modificarse. La cita se marcará como completada.
+            {faltantes.length > 0
+              ? `Sin texto en ${faltantes.map((c) => c.label).join(", ")}. Puedes finalizar ahora y completarlos después desde la nota.`
+              : "La cita se marcará como completada. Podrás editar la nota después; cada cambio queda en el historial."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Seguir escribiendo</AlertDialogCancel>
-          <AlertDialogAction onClick={finalizar}>Finalizar y cerrar nota</AlertDialogAction>
+          <AlertDialogAction onClick={finalizar}>
+            {faltantes.length > 0 ? "Finalizar, lo lleno después" : "Finalizar sesión"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+
+  const accionPrincipal = edicion ? (
+    <div className="flex gap-2 max-sm:[&>*]:flex-1">
+      <Button variant="outline" asChild>
+        <Link href={`/citas/${citaId}/sesion`}>Cancelar</Link>
+      </Button>
+      <Button onClick={guardarEdicion} disabled={finalizando || estado.tipo === "inicial"}>
+        <SaveIcon /> {finalizando ? "Guardando…" : "Guardar cambios"}
+      </Button>
+    </div>
+  ) : (
+    finalizarBoton
   );
 
   return (
@@ -187,14 +235,20 @@ export function NotaSesionForm({
       <CabeceraSesion
         izquierda={cabeceraIzquierda}
         acciones={cabeceraAcciones}
-        final={finalizarBoton}
+        final={accionPrincipal}
       />
 
       <div className="relative grid gap-6 @min-[900px]:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid min-w-0 content-start gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[22px] font-bold">Nota de evolución</h2>
-            <EstadoGuardado estado={estado} onReintentar={() => void guardar()} />
+            <h2 className="text-[22px] font-bold">
+              {edicion ? "Editar nota de evolución" : "Nota de evolución"}
+            </h2>
+            <EstadoGuardado
+              estado={estado}
+              edicion={edicion}
+              onReintentar={() => void (edicion ? guardarEdicion() : guardar())}
+            />
           </div>
 
           <div role="tablist" aria-label="Secciones de la nota" className="sticky top-0 z-10 -mx-1 flex gap-1.5 bg-background/95 px-1 py-2 backdrop-blur @min-[600px]:hidden">
@@ -392,21 +446,35 @@ export function NotaSesionForm({
       </div>
 
       <div className="sticky bottom-0 z-20 -mx-[clamp(16px,3vw,32px)] border-t bg-background/95 px-[clamp(16px,3vw,32px)] pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur @min-[600px]:hidden [&_button]:h-[52px] [&_button]:w-full">
-        {finalizarBoton}
+        {accionPrincipal}
       </div>
     </div>
   );
 }
 
-function EstadoGuardado({ estado, onReintentar }: { estado: Estado; onReintentar: () => void }) {
+function EstadoGuardado({
+  estado,
+  edicion,
+  onReintentar,
+}: {
+  estado: Estado;
+  edicion: boolean;
+  onReintentar: () => void;
+}) {
   const base = "inline-flex items-center gap-1.5 text-sm font-semibold";
   return (
     <span aria-live="polite">
-      {estado.tipo === "inicial" && (
-        <span className={cn(base, "text-muted-foreground")}>
-          <CloudUploadIcon className="size-4" aria-hidden="true" /> Se guarda automáticamente
-        </span>
-      )}
+      {estado.tipo === "inicial" &&
+        (edicion ? (
+          <span className={cn(base, "text-muted-foreground")}>
+            <HistoryIcon className="size-4" aria-hidden="true" /> La versión actual se guardará en
+            el historial
+          </span>
+        ) : (
+          <span className={cn(base, "text-muted-foreground")}>
+            <CloudUploadIcon className="size-4" aria-hidden="true" /> Se guarda automáticamente
+          </span>
+        ))}
       {estado.tipo === "sucio" && (
         <span className={cn(base, "text-muted-foreground")}>Cambios sin guardar…</span>
       )}
@@ -417,7 +485,8 @@ function EstadoGuardado({ estado, onReintentar }: { estado: Estado; onReintentar
       )}
       {estado.tipo === "guardado" && (
         <span className={cn(base, "text-success")}>
-          <CircleCheckIcon className="size-4" aria-hidden="true" /> Borrador guardado a las{" "}
+          <CircleCheckIcon className="size-4" aria-hidden="true" />{" "}
+          {edicion ? "Guardado a las" : "Borrador guardado a las"}{" "}
           {new Date(estado.en).toLocaleTimeString("es-MX", {
             hour: "2-digit",
             minute: "2-digit",

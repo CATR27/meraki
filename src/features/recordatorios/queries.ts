@@ -1,7 +1,8 @@
 import "server-only";
 import { and, asc, count, desc, eq, gte, inArray, lt, lte } from "drizzle-orm";
 import { db } from "@/db";
-import { citas, consultantes, recordatorios } from "@/db/schema";
+import { citas, consultantes, notasSesion, recordatorios } from "@/db/schema";
+import { notaPorCompletarSql } from "@/features/sesiones/queries";
 import { rangoVista } from "@/lib/agenda";
 import { requireRole } from "@/lib/dal";
 import { hoyISO } from "@/lib/dates";
@@ -51,8 +52,8 @@ export async function listarRecordatorios() {
 export type Recordatorio = Awaited<ReturnType<typeof listarRecordatorios>>["hoy"][number];
 
 /**
- * Avisos de la campana: recordatorios pendientes hasta el final de hoy y
- * citas vigentes en las próximas 24 horas.
+ * Avisos de la campana: recordatorios pendientes hasta el final de hoy,
+ * citas vigentes en las próximas 24 horas y sesiones finalizadas sin nota.
  */
 export async function avisosPendientes() {
   const user = await requireRole("psicologo");
@@ -60,7 +61,7 @@ export async function avisosPendientes() {
   const ahora = new Date();
   const en24h = new Date(ahora.getTime() + 24 * 3600_000);
 
-  const [rec, proximas] = await Promise.all([
+  const [rec, proximas, porCompletar] = await Promise.all([
     db
       .select({
         id: recordatorios.id,
@@ -96,12 +97,26 @@ export async function avisosPendientes() {
       )
       .orderBy(asc(citas.inicio))
       .limit(10),
+    db
+      .select({
+        id: notasSesion.id,
+        citaId: notasSesion.citaId,
+        fecha: notasSesion.fecha,
+        nombre: consultantes.nombre,
+        apellidos: consultantes.apellidos,
+      })
+      .from(notasSesion)
+      .innerJoin(consultantes, eq(consultantes.id, notasSesion.consultanteId))
+      .where(and(eq(notasSesion.psicologoId, user.id), notaPorCompletarSql))
+      .orderBy(desc(notasSesion.fecha))
+      .limit(10),
   ]);
 
   return {
     recordatorios: rec.map((r) => ({ ...r, vencido: r.fechaHora < ahora })),
     citas: proximas,
-    total: rec.length + proximas.length,
+    notas: porCompletar,
+    total: rec.length + proximas.length + porCompletar.length,
   };
 }
 

@@ -49,10 +49,14 @@ export const notaSchema = z.object({
 export type NotaInput = z.input<typeof notaSchema>;
 export type NotaDatos = z.output<typeof notaSchema>;
 
-/** Al cerrar la nota se exige un mínimo de contenido clínico. */
-export function validarCierre(datos: NotaDatos): string | null {
-  if (!datos.subjetivo && !datos.objetivo && !datos.analisis && !datos.plan) {
-    return "Escribe al menos uno de los apartados S, O, A o P antes de finalizar.";
-  }
-  return null;
+type CamposSoap = Partial<Record<(typeof CAMPOS_SOAP)[number]["campo"], string | null>>;
+
+/** Apartados S, O, A o P que siguen sin texto. */
+export function apartadosVacios(nota: CamposSoap) {
+  return CAMPOS_SOAP.filter(({ campo }) => !nota[campo]?.trim());
+}
+
+/** Sesión finalizada sin nada en S, O, A ni P: queda pendiente de completar. */
+export function notaPorCompletar(nota: CamposSoap & { estado: string }) {
+  return nota.estado === "cerrada" && apartadosVacios(nota).length === CAMPOS_SOAP.length;
 }

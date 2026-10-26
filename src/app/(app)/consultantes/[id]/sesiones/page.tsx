@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { agendaHref } from "@/features/citas/urls";
 import { notasDeConsultante, type NotaResumen } from "@/features/sesiones/queries";
-import { RIESGO_LABEL } from "@/features/sesiones/schemas";
+import { notaPorCompletar, RIESGO_LABEL } from "@/features/sesiones/schemas";
 import { requireRole } from "@/lib/dal";
 import { formatEnZona } from "@/lib/dates";
 import { mayuscula } from "@/lib/format";
@@ -58,6 +58,8 @@ export default async function SesionesPage({ params }: PageProps<"/consultantes/
                 </span>
                 <span className="ml-auto flex flex-wrap gap-1.5">
                   {n.estado === "borrador" && <StatusBadge tono="warning">Borrador</StatusBadge>}
+                  {notaPorCompletar(n) && <StatusBadge tono="warning">Por completar</StatusBadge>}
+                  {n.editadaAt && <StatusBadge tono="neutral">Editada</StatusBadge>}
                   {n.estadoAnimo != null && (
                     <StatusBadge tono="primary">Ánimo {n.estadoAnimo}/10</StatusBadge>
                   )}
@@ -75,9 +77,13 @@ export default async function SesionesPage({ params }: PageProps<"/consultantes/
               )}
               {n.citaId && (
                 <Button variant="link" className="mt-1 h-auto p-0" asChild>
-                  <Link href={`/citas/${n.citaId}/sesion`}>
-                    {n.estado === "borrador" ? "Continuar nota" : "Ver nota completa"}
-                  </Link>
+                  {notaPorCompletar(n) ? (
+                    <Link href={`/citas/${n.citaId}/sesion?editar=1`}>Completar nota</Link>
+                  ) : (
+                    <Link href={`/citas/${n.citaId}/sesion`}>
+                      {n.estado === "borrador" ? "Continuar nota" : "Ver nota completa"}
+                    </Link>
+                  )}
                 </Button>
               )}
             </article>

@@ -1,7 +1,7 @@
 import { agendaHref } from "@/features/citas/urls";
 import { aLocal } from "@/lib/agenda";
 import { requireRole } from "@/lib/dal";
-import { cuandoRelativo } from "@/lib/dates";
+import { cuandoRelativo, formatEnZona } from "@/lib/dates";
 import { nombreCompleto } from "@/lib/format";
 import { avisosPendientes } from "../queries";
 import { Campana } from "./campana";
@@ -24,6 +24,12 @@ export async function CampanaServidor() {
         cuando: cuandoRelativo(r.fechaHora, zona),
         href: "/recordatorios",
         vencido: r.vencido,
+      }))}
+      notas={avisos.notas.map((n) => ({
+        id: n.id,
+        titulo: nombreCompleto(n),
+        cuando: `Sesión del ${formatEnZona(n.fecha, "d MMM", zona)}`,
+        href: `/citas/${n.citaId}/sesion?editar=1`,
       }))}
     />
   );

@@ -1,6 +1,12 @@
 "use client";
 
-import { BellIcon, BellRingIcon, CalendarClockIcon, ListTodoIcon } from "lucide-react";
+import {
+  BellIcon,
+  BellRingIcon,
+  CalendarClockIcon,
+  FilePenLineIcon,
+  ListTodoIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -8,10 +14,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 type Aviso = { id: string; titulo: string; cuando: string; href: string; vencido?: boolean };
 
-/** Campana del encabezado con citas de las próximas 24 h y recordatorios pendientes. */
-export function Campana({ citas, recordatorios }: { citas: Aviso[]; recordatorios: Aviso[] }) {
+/** Campana del encabezado: citas de las próximas 24 h, recordatorios y notas por completar. */
+export function Campana({
+  citas,
+  recordatorios,
+  notas,
+}: {
+  citas: Aviso[];
+  recordatorios: Aviso[];
+  notas: Aviso[];
+}) {
   const [open, setOpen] = useState(false);
-  const total = citas.length + recordatorios.length;
+  const total = citas.length + recordatorios.length + notas.length;
   const Icono = total > 0 ? BellRingIcon : BellIcon;
 
   return (
@@ -51,6 +65,12 @@ export function Campana({ citas, recordatorios }: { citas: Aviso[]; recordatorio
             titulo="Recordatorios"
             icono={ListTodoIcon}
             avisos={recordatorios}
+            cerrar={() => setOpen(false)}
+          />
+          <Grupo
+            titulo="Notas por completar"
+            icono={FilePenLineIcon}
+            avisos={notas}
             cerrar={() => setOpen(false)}
           />
         </div>

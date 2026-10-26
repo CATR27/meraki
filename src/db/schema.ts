@@ -227,6 +227,9 @@ export const notasSesion = sqliteTable(
     tareasAsignadas: text("tareas_asignadas"),
     observaciones: text("observaciones"),
     estado: text("estado", { enum: ESTADOS_NOTA }).notNull().default("borrador"),
+    // Cada edición tras el cierre guarda la versión anterior en notas_sesion_versiones.
+    version: integer("version").notNull().default(1),
+    editadaAt: integer("editada_at", { mode: "timestamp_ms" }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -234,6 +237,35 @@ export const notasSesion = sqliteTable(
     index("notas_consultante_fecha_idx").on(t.consultanteId, t.fecha),
     uniqueIndex("notas_cita_unique_idx").on(t.citaId),
   ],
+);
+
+export const ORIGENES_VERSION = ["manual", "ia"] as const;
+
+/** Historial de una nota cerrada: el contenido tal como estaba antes de cada edición. */
+export const notasSesionVersiones = sqliteTable(
+  "notas_sesion_versiones",
+  {
+    id: id(),
+    notaId: text("nota_id")
+      .notNull()
+      .references(() => notasSesion.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    subjetivo: text("subjetivo"),
+    objetivo: text("objetivo"),
+    analisis: text("analisis"),
+    plan: text("plan"),
+    estadoAnimo: integer("estado_animo"),
+    nivelRiesgo: text("nivel_riesgo", { enum: NIVELES_RIESGO }).notNull(),
+    tareasAsignadas: text("tareas_asignadas"),
+    observaciones: text("observaciones"),
+    // Quién y cómo se reemplazó esta versión.
+    origen: text("origen", { enum: ORIGENES_VERSION }).notNull().default("manual"),
+    editadoPor: text("editado_por")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("notas_versiones_nota_version_idx").on(t.notaId, t.version)],
 );
 
 export const recordatorios = sqliteTable(
