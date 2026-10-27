@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { MODALIDAD_LABEL } from "@/features/citas/constantes";
 import { agendaHref } from "@/features/citas/urls";
 import { grabacionDisponible } from "@/features/grabacion/almacen";
+import { PanelIa } from "@/features/grabacion/components/panel-ia";
+import { iaDisponible } from "@/features/grabacion/ia";
 import { obtenerGrabacion } from "@/features/grabacion/queries";
 import { SECCIONES_EXPEDIENTE } from "@/features/expediente/secciones";
 import { CabeceraSesion } from "@/features/sesiones/components/cabecera-sesion";
@@ -22,6 +24,9 @@ import { formatEnZona } from "@/lib/dates";
 import { iniciales, nombreCompleto } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Sesión" };
+
+const duracionAudio = (ms: number) =>
+  ms < 60_000 ? `${Math.max(1, Math.round(ms / 1000))} s` : `${Math.round(ms / 60_000)} min`;
 
 export default async function SesionPage({
   params,
@@ -131,6 +136,7 @@ export default async function SesionPage({
         cabeceraIzquierda={izquierda}
         cabeceraAcciones={acciones}
         lateral={<ResumenPanel sesion={sesion} zona={zona} />}
+        iaDisponible={iaDisponible}
         grabacion={
           grabacionDisponible && cita.modalidad === "presencial" && grabacion?.estado !== "finalizada"
             ? {
@@ -150,11 +156,46 @@ export default async function SesionPage({
 
   const historial = cerrada && nota ? await historialDeNota(nota.id) : [];
 
+  const atascada = grabacion?.atascada;
+  const mostrarIa =
+    cerrada && nota && grabacion && grabacion.estado !== "grabando" &&
+    (grabacion.fragmentos > 0 || grabacion.transcripcion);
+  const panelIa = mostrarIa ? (
+    <PanelIa
+      citaId={cita.id}
+      iaDisponible={iaDisponible}
+      estado={atascada ? "error" : (grabacion.estado as "finalizada" | "procesando" | "lista" | "error")}
+      error={atascada ? "El procesamiento tardó demasiado. Vuelve a intentarlo." : grabacion.error}
+      tieneAudio={grabacion.fragmentos > 0 && !grabacion.audioBorradoAt}
+      resumenAudio={[
+        `${duracionAudio(grabacion.duracionMs)} grabados`,
+        grabacion.audioBorrarEn &&
+          `se borra el ${formatEnZona(grabacion.audioBorrarEn, "d 'de' MMMM", zona)}`,
+      ]
+        .filter(Boolean)
+        .join(" · ")}
+      propuesta={grabacion.propuesta}
+      revisada={grabacion.revisadaAt != null}
+      transcripcion={grabacion.transcripcion}
+      nota={{
+        subjetivo: nota.subjetivo,
+        objetivo: nota.objetivo,
+        analisis: nota.analisis,
+        plan: nota.plan,
+        tareasAsignadas: nota.tareasAsignadas,
+        observaciones: nota.observaciones,
+        estadoAnimo: nota.estadoAnimo,
+        nivelRiesgo: nota.nivelRiesgo,
+      }}
+    />
+  ) : null;
+
   return (
     <div className="grid gap-6">
       <CabeceraSesion izquierda={izquierda} acciones={acciones} />
       <div className="grid gap-6 @min-[900px]:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0">
+        <div className="grid min-w-0 content-start gap-4">
+          {panelIa}
           {cerrada && nota ? (
             <NotaLectura nota={nota} historial={historial} zona={zona} />
           ) : (

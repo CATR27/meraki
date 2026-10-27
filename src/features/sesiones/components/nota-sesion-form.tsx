@@ -8,6 +8,7 @@ import {
   LockKeyholeIcon,
   PhoneIcon,
   SaveIcon,
+  SparklesIcon,
   TriangleAlertIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -84,7 +85,9 @@ type Props = {
   /** Columna lateral con contexto (tareas, expediente, sesiones anteriores). */
   lateral: ReactNode;
   /** Solo en sesiones presenciales con el almacenamiento de audio configurado. */
-  grabacion?: Omit<ComponentProps<typeof Grabador>, "citaId" | "ref" | "onFragmentos">;
+  grabacion?: Omit<ComponentProps<typeof Grabador>, "citaId" | "ref" | "onAudio">;
+  /** Si hay grabación, al finalizar se ofrece que la IA complete lo que falte. */
+  iaDisponible?: boolean;
 };
 
 export function NotaSesionForm({
@@ -96,9 +99,11 @@ export function NotaSesionForm({
   cabeceraAcciones,
   lateral,
   grabacion,
+  iaDisponible = false,
 }: Props) {
   const router = useRouter();
   const grabador = useRef<GrabadorHandle>(null);
+  const [hayAudio, setHayAudio] = useState((grabacion?.inicial.fragmentos ?? 0) > 0);
   const edicion = modo === "edicion";
   const [valores, setValores] = useState(inicial);
   const [estado, setEstado] = useState<Estado>({ tipo: "inicial" });
@@ -165,7 +170,7 @@ export function NotaSesionForm({
     [],
   );
 
-  function finalizar() {
+  function finalizar(ia = false) {
     if (timer.current) clearTimeout(timer.current);
     startFinalizar(async () => {
       try {
@@ -175,7 +180,10 @@ export function NotaSesionForm({
           toast.error("Falta subir parte del audio. Revisa tu conexión y vuelve a finalizar.");
           return;
         }
-        const res = await finalizarSesion(citaId, valoresRef.current);
+        if (ia) {
+          toast.info("La IA está trabajando en la nota. Te avisaremos en la campana cuando esté lista.");
+        }
+        const res = await finalizarSesion(citaId, valoresRef.current, { ia });
         if (res && !res.ok) toast.error(res.message);
       } catch (error) {
         // redirect() viaja como un error especial que Next maneja; solo avisamos de errores reales.
@@ -206,6 +214,7 @@ export function NotaSesionForm({
 
   const riesgoAlto = valores.nivelRiesgo === "medio" || valores.nivelRiesgo === "alto";
   const faltantes = apartadosVacios(valores);
+  const ofrecerIa = iaDisponible && hayAudio && faltantes.length > 0;
 
   const finalizarBoton = (
     <AlertDialog>
@@ -220,15 +229,30 @@ export function NotaSesionForm({
             {faltantes.length > 0 ? "Faltan apartados por llenar" : "¿Finalizar la sesión?"}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {faltantes.length > 0
-              ? `Sin texto en ${faltantes.map((c) => c.label).join(", ")}. Puedes finalizar ahora y completarlos después desde la nota.`
-              : "La cita se marcará como completada. Podrás editar la nota después; cada cambio queda en el historial."}
+            {ofrecerIa
+              ? `Sin texto en ${faltantes.map((c) => c.label).join(", ")}. Con la grabación, la IA puede proponerlos mientras sigues con tu día; tú revisas antes de que entren a la nota.`
+              : faltantes.length > 0
+                ? `Sin texto en ${faltantes.map((c) => c.label).join(", ")}. Puedes finalizar ahora y completarlos después desde la nota.`
+                : "La cita se marcará como completada. Podrás editar la nota después; cada cambio queda en el historial."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Seguir escribiendo</AlertDialogCancel>
-          <AlertDialogAction onClick={finalizar}>
-            {faltantes.length > 0 ? "Finalizar, lo lleno después" : "Finalizar sesión"}
+          {ofrecerIa && (
+            <AlertDialogAction variant="outline" onClick={() => finalizar()}>
+              Lo lleno yo después
+            </AlertDialogAction>
+          )}
+          <AlertDialogAction onClick={() => finalizar(ofrecerIa)}>
+            {ofrecerIa ? (
+              <>
+                <SparklesIcon /> Que la IA lo complete
+              </>
+            ) : faltantes.length > 0 ? (
+              "Finalizar, lo lleno después"
+            ) : (
+              "Finalizar sesión"
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -255,7 +279,14 @@ export function NotaSesionForm({
         izquierda={cabeceraIzquierda}
         acciones={
           <>
-            {grabacion && !edicion && <Grabador ref={grabador} citaId={citaId} {...grabacion} />}
+            {grabacion && !edicion && (
+              <Grabador
+                ref={grabador}
+                citaId={citaId}
+                onAudio={setHayAudio}
+                {...grabacion}
+              />
+            )}
             {cabeceraAcciones}
           </>
         }

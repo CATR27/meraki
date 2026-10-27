@@ -4,17 +4,17 @@ import { and, count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { citas, notasSesion, notasSesionVersiones, type ORIGENES_VERSION } from "@/db/schema";
+import { citas, notasSesion } from "@/db/schema";
 import { cerrarGrabacion } from "@/features/grabacion/almacen";
+import { iaDisponible } from "@/features/grabacion/ia";
+import { encolarProcesamiento } from "@/features/grabacion/procesar";
+import { grabacionConAudio } from "@/features/grabacion/queries";
 import { registrarBitacora } from "@/lib/bitacora";
 import { requireRole } from "@/lib/dal";
+import { reemplazarNotaCerrada, type ResultadoGuardado } from "./edicion";
 import { type NotaDatos, type NotaInput, notaSchema } from "./schemas";
 
-type OrigenVersion = (typeof ORIGENES_VERSION)[number];
-
-export type ResultadoGuardado =
-  | { ok: true; guardadoEn: number }
-  | { ok: false; message: string; fieldErrors?: Record<string, string[] | undefined> };
+export type { ResultadoGuardado } from "./edicion";
 
 /** Crea o actualiza la nota de una cita. Una nota cerrada ya no se modifica. */
 async function guardarNota(
@@ -94,6 +94,7 @@ export async function guardarBorradorNota(
 export async function finalizarSesion(
   citaId: string,
   entrada: NotaInput,
+  opciones: { ia?: boolean } = {},
 ): Promise<ResultadoGuardado> {
   const user = await requireRole("psicologo");
   const parsed = notaSchema.safeParse(entrada);
@@ -103,67 +104,16 @@ export async function finalizarSesion(
   const resultado = await guardarNota(user.id, citaId, parsed.data, true);
   if (!resultado.ok) return resultado;
 
+  // La IA trabaja en segundo plano: el psicólogo sigue usando la plataforma.
+  if (opciones.ia && iaDisponible) {
+    const grabacion = await grabacionConAudio(user.id, citaId);
+    if (grabacion) await encolarProcesamiento(grabacion.id);
+  }
+
   revalidatePath("/agenda");
   revalidatePath("/panel");
   revalidatePath(`/consultantes/${resultado.consultanteId}`, "layout");
   redirect(`/consultantes/${resultado.consultanteId}/sesiones`);
-}
-
-const CAMPOS_VERSIONADOS = [
-  "subjetivo",
-  "objetivo",
-  "analisis",
-  "plan",
-  "estadoAnimo",
-  "nivelRiesgo",
-  "tareasAsignadas",
-  "observaciones",
-] as const;
-
-/**
- * Reemplaza el contenido de una nota cerrada. La versión vigente pasa antes al
- * historial (notas_sesion_versiones) para conservar la trazabilidad del registro clínico.
- */
-async function reemplazarNotaCerrada(
-  psicologoId: string,
-  citaId: string,
-  datos: NotaDatos,
-  origen: OrigenVersion,
-): Promise<ResultadoGuardado & { consultanteId?: string }> {
-  const [nota] = await db
-    .select()
-    .from(notasSesion)
-    .where(and(eq(notasSesion.citaId, citaId), eq(notasSesion.psicologoId, psicologoId)))
-    .limit(1);
-  if (!nota) return { ok: false, message: "La nota no existe." };
-  if (nota.estado !== "cerrada") return { ok: false, message: "La sesión aún no se finaliza." };
-
-  const sinCambios = CAMPOS_VERSIONADOS.every((c) => (nota[c] ?? null) === (datos[c] ?? null));
-  if (sinCambios) return { ok: true, guardadoEn: Date.now(), consultanteId: nota.consultanteId };
-
-  try {
-    await db.transaction(async (tx) => {
-      await tx.insert(notasSesionVersiones).values({
-        ...Object.fromEntries(CAMPOS_VERSIONADOS.map((c) => [c, nota[c]])),
-        nivelRiesgo: nota.nivelRiesgo,
-        notaId: nota.id,
-        version: nota.version,
-        origen,
-        editadoPor: psicologoId,
-      });
-      await tx
-        .update(notasSesion)
-        .set({ ...datos, version: nota.version + 1, editadaAt: new Date() })
-        .where(eq(notasSesion.id, nota.id));
-    });
-  } catch (error) {
-    // El índice único (nota, versión) frena dos ediciones simultáneas de la misma versión.
-    console.error("[nota]", error instanceof Error ? error.message : error);
-    return { ok: false, message: "La nota cambió mientras la editabas. Recarga e inténtalo de nuevo." };
-  }
-
-  registrarBitacora(psicologoId, "editar", "nota", nota.id);
-  return { ok: true, guardadoEn: Date.now(), consultanteId: nota.consultanteId };
 }
 
 /** Edición de una nota ya finalizada (queda registrada en el historial). */

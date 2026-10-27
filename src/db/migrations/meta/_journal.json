@@ -29,6 +29,13 @@
       "when": 1793124387637,
       "tag": "0003_grabaciones",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793125457006,
+      "tag": "0004_propuesta_revisada",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `grabaciones_sesion` ADD `revisada_at` integer;

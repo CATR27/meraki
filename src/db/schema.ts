@@ -331,6 +331,8 @@ export const grabacionesSesion = sqliteTable(
     audioBorrarEn: integer("audio_borrar_en", { mode: "timestamp_ms" }),
     audioBorradoAt: integer("audio_borrado_at", { mode: "timestamp_ms" }),
     procesadaAt: integer("procesada_at", { mode: "timestamp_ms" }),
+    // Cuándo el psicólogo aplicó o descartó la propuesta (deja de avisarse).
+    revisadaAt: integer("revisada_at", { mode: "timestamp_ms" }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

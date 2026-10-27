@@ -49,3 +49,5 @@ next-env.d.ts
 
 # correos atrapados en desarrollo
 /.mail
+
+.env*.local

@@ -6,6 +6,7 @@ import {
   CalendarClockIcon,
   FilePenLineIcon,
   ListTodoIcon,
+  SparklesIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -19,13 +20,15 @@ export function Campana({
   citas,
   recordatorios,
   notas,
+  propuestas,
 }: {
   citas: Aviso[];
   recordatorios: Aviso[];
   notas: Aviso[];
+  propuestas: Aviso[];
 }) {
   const [open, setOpen] = useState(false);
-  const total = citas.length + recordatorios.length + notas.length;
+  const total = citas.length + recordatorios.length + notas.length + propuestas.length;
   const Icono = total > 0 ? BellRingIcon : BellIcon;
 
   return (
@@ -55,6 +58,12 @@ export function Campana({
               Todo al día. No tienes pendientes.
             </p>
           )}
+          <Grupo
+            titulo="Propuestas de la IA"
+            icono={SparklesIcon}
+            avisos={propuestas}
+            cerrar={() => setOpen(false)}
+          />
           <Grupo
             titulo="Citas en las próximas 24 h"
             icono={CalendarClockIcon}

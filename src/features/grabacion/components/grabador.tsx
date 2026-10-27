@@ -34,7 +34,8 @@ type Props = {
   consentimiento: boolean;
   /** Lo ya grabado si la página se recargó a mitad de la sesión. */
   inicial: { fragmentos: number; duracionMs: number };
-  onFragmentos?: (total: number) => void;
+  /** Avisa si ya hay audio de la sesión (para ofrecer la IA al finalizar). */
+  onAudio?: (hayAudio: boolean) => void;
   ref?: Ref<GrabadorHandle>;
 };
 
@@ -58,7 +59,7 @@ export function Grabador({
   consultanteNombre,
   consentimiento,
   inicial,
-  onFragmentos,
+  onAudio,
   ref,
 }: Props) {
   const [estado, setEstado] = useState<Estado>("inactivo");
@@ -280,7 +281,9 @@ export function Grabador({
 
   useImperativeHandle(ref, () => ({ detener }), [detener]);
 
-  useEffect(() => onFragmentos?.(subidos + pendientes), [onFragmentos, subidos, pendientes]);
+  // Cuenta también el fragmento en curso: al finalizar se cierra y se sube.
+  const hayAudio = subidos + pendientes > 0 || msGrabados >= 1000;
+  useEffect(() => onAudio?.(hayAudio), [onAudio, hayAudio]);
 
   // Reloj en vivo mientras se graba.
   useEffect(() => {

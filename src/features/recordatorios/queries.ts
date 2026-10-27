@@ -1,7 +1,7 @@
 import "server-only";
-import { and, asc, count, desc, eq, gte, inArray, lt, lte } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNull, lt, lte } from "drizzle-orm";
 import { db } from "@/db";
-import { citas, consultantes, notasSesion, recordatorios } from "@/db/schema";
+import { citas, consultantes, grabacionesSesion, notasSesion, recordatorios } from "@/db/schema";
 import { notaPorCompletarSql } from "@/features/sesiones/queries";
 import { rangoVista } from "@/lib/agenda";
 import { requireRole } from "@/lib/dal";
@@ -61,7 +61,7 @@ export async function avisosPendientes() {
   const ahora = new Date();
   const en24h = new Date(ahora.getTime() + 24 * 3600_000);
 
-  const [rec, proximas, porCompletar] = await Promise.all([
+  const [rec, proximas, porCompletar, propuestas] = await Promise.all([
     db
       .select({
         id: recordatorios.id,
@@ -110,13 +110,33 @@ export async function avisosPendientes() {
       .where(and(eq(notasSesion.psicologoId, user.id), notaPorCompletarSql))
       .orderBy(desc(notasSesion.fecha))
       .limit(10),
+    db
+      .select({
+        citaId: grabacionesSesion.citaId,
+        estado: grabacionesSesion.estado,
+        procesadaAt: grabacionesSesion.procesadaAt,
+        nombre: consultantes.nombre,
+        apellidos: consultantes.apellidos,
+      })
+      .from(grabacionesSesion)
+      .innerJoin(consultantes, eq(consultantes.id, grabacionesSesion.consultanteId))
+      .where(
+        and(
+          eq(grabacionesSesion.psicologoId, user.id),
+          inArray(grabacionesSesion.estado, ["lista", "error"]),
+          isNull(grabacionesSesion.revisadaAt),
+        ),
+      )
+      .orderBy(desc(grabacionesSesion.updatedAt))
+      .limit(10),
   ]);
 
   return {
     recordatorios: rec.map((r) => ({ ...r, vencido: r.fechaHora < ahora })),
     citas: proximas,
     notas: porCompletar,
-    total: rec.length + proximas.length + porCompletar.length,
+    propuestas,
+    total: rec.length + proximas.length + porCompletar.length + propuestas.length,
   };
 }
 

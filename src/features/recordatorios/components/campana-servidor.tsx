@@ -25,6 +25,16 @@ export async function CampanaServidor() {
         href: "/recordatorios",
         vencido: r.vencido,
       }))}
+      propuestas={avisos.propuestas.map((p) => ({
+        id: p.citaId,
+        titulo: nombreCompleto(p),
+        cuando:
+          p.estado === "error"
+            ? "No se pudo procesar el audio"
+            : `Propuesta lista ${p.procesadaAt ? cuandoRelativo(p.procesadaAt, zona) : ""}`.trim(),
+        href: `/citas/${p.citaId}/sesion`,
+        vencido: p.estado === "error",
+      }))}
       notas={avisos.notas.map((n) => ({
         id: n.id,
         titulo: nombreCompleto(n),
