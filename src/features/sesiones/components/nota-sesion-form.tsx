@@ -13,7 +13,16 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Ornamento } from "@/components/brand/ornamento";
-import { type ReactNode, useCallback, useEffect, useRef, useState, useTransition } from "react";
+import {
+  type ComponentProps,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import { Grabador, type GrabadorHandle } from "@/features/grabacion/components/grabador";
 import { toast } from "sonner";
 import { Field } from "@/components/shared/form-field";
 import {
@@ -74,6 +83,8 @@ type Props = {
   cabeceraAcciones: ReactNode;
   /** Columna lateral con contexto (tareas, expediente, sesiones anteriores). */
   lateral: ReactNode;
+  /** Solo en sesiones presenciales con el almacenamiento de audio configurado. */
+  grabacion?: Omit<ComponentProps<typeof Grabador>, "citaId" | "ref" | "onFragmentos">;
 };
 
 export function NotaSesionForm({
@@ -84,8 +95,10 @@ export function NotaSesionForm({
   cabeceraIzquierda,
   cabeceraAcciones,
   lateral,
+  grabacion,
 }: Props) {
   const router = useRouter();
+  const grabador = useRef<GrabadorHandle>(null);
   const edicion = modo === "edicion";
   const [valores, setValores] = useState(inicial);
   const [estado, setEstado] = useState<Estado>({ tipo: "inicial" });
@@ -156,6 +169,12 @@ export function NotaSesionForm({
     if (timer.current) clearTimeout(timer.current);
     startFinalizar(async () => {
       try {
+        // El audio debe terminar de subirse antes de cerrar: después ya no se aceptan fragmentos.
+        const audio = await grabador.current?.detener();
+        if (audio && audio.pendientes > 0) {
+          toast.error("Falta subir parte del audio. Revisa tu conexión y vuelve a finalizar.");
+          return;
+        }
         const res = await finalizarSesion(citaId, valoresRef.current);
         if (res && !res.ok) toast.error(res.message);
       } catch (error) {
@@ -234,7 +253,12 @@ export function NotaSesionForm({
       <Ornamento n="14_ola_botanica" anim="breathe" op={0.55} dur={14} origen="0% 100%" className="bottom-0 left-0 -z-10 hidden size-[440px] [mask-image:linear-gradient(90deg,#000_55%,transparent)] @min-[900px]:block" />
       <CabeceraSesion
         izquierda={cabeceraIzquierda}
-        acciones={cabeceraAcciones}
+        acciones={
+          <>
+            {grabacion && !edicion && <Grabador ref={grabador} citaId={citaId} {...grabacion} />}
+            {cabeceraAcciones}
+          </>
+        }
         final={accionPrincipal}
       />
 

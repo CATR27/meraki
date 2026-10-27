@@ -5,6 +5,8 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { MODALIDAD_LABEL } from "@/features/citas/constantes";
 import { agendaHref } from "@/features/citas/urls";
+import { grabacionDisponible } from "@/features/grabacion/almacen";
+import { obtenerGrabacion } from "@/features/grabacion/queries";
 import { SECCIONES_EXPEDIENTE } from "@/features/expediente/secciones";
 import { CabeceraSesion } from "@/features/sesiones/components/cabecera-sesion";
 import { Cronometro } from "@/features/sesiones/components/cronometro";
@@ -26,7 +28,11 @@ export default async function SesionPage({
   searchParams,
 }: PageProps<"/citas/[id]/sesion">) {
   const [{ id }, { editar }] = await Promise.all([params, searchParams]);
-  const [user, sesion] = await Promise.all([requireRole("psicologo"), obtenerSesion(id)]);
+  const [user, sesion, grabacion] = await Promise.all([
+    requireRole("psicologo"),
+    obtenerSesion(id),
+    obtenerGrabacion(id),
+  ]);
   const { cita, consultante, expediente, nota } = sesion;
   const zona = user.zonaHoraria;
   if (nota) registrarBitacora(user.id, "ver", "nota", nota.id);
@@ -125,6 +131,19 @@ export default async function SesionPage({
         cabeceraIzquierda={izquierda}
         cabeceraAcciones={acciones}
         lateral={<ResumenPanel sesion={sesion} zona={zona} />}
+        grabacion={
+          grabacionDisponible && cita.modalidad === "presencial" && grabacion?.estado !== "finalizada"
+            ? {
+                consultanteId: consultante.id,
+                consultanteNombre: consultante.nombre,
+                consentimiento: consultante.consentimientoGrabacionAt != null,
+                inicial: {
+                  fragmentos: grabacion?.fragmentos ?? 0,
+                  duracionMs: grabacion?.duracionMs ?? 0,
+                },
+              }
+            : undefined
+        }
       />
     );
   }

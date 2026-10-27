@@ -3,7 +3,7 @@ import { after } from "next/server";
 import { db } from "@/db";
 import { bitacora } from "@/db/schema";
 
-export type AccionBitacora = "ver" | "crear" | "editar" | "cerrar" | "estado";
+export type AccionBitacora = "ver" | "crear" | "editar" | "cerrar" | "estado" | "eliminar";
 
 /**
  * Registra quién consultó o modificó información clínica.
@@ -12,7 +12,7 @@ export type AccionBitacora = "ver" | "crear" | "editar" | "cerrar" | "estado";
 export function registrarBitacora(
   userId: string,
   accion: AccionBitacora,
-  entidad: "consultante" | "expediente" | "nota" | "cita",
+  entidad: "consultante" | "expediente" | "nota" | "cita" | "grabacion",
   entidadId: string,
 ) {
   after(async () => {

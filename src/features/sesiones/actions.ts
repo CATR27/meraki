@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { citas, notasSesion, notasSesionVersiones, type ORIGENES_VERSION } from "@/db/schema";
+import { cerrarGrabacion } from "@/features/grabacion/almacen";
 import { registrarBitacora } from "@/lib/bitacora";
 import { requireRole } from "@/lib/dal";
 import { type NotaDatos, type NotaInput, notaSchema } from "./schemas";
@@ -70,6 +71,7 @@ async function guardarNota(
 
   if (cerrar) {
     await db.update(citas).set({ estado: "completada" }).where(eq(citas.id, citaId));
+    await cerrarGrabacion(citaId);
     registrarBitacora(psicologoId, "cerrar", "nota", notaId!);
   }
 

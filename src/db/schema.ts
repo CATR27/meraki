@@ -139,6 +139,8 @@ export const consultantes = sqliteTable(
       .notNull()
       .default(false),
     consentimientoFecha: text("consentimiento_fecha"), // YYYY-MM-DD
+    // Consentimiento específico para grabar el audio de las sesiones.
+    consentimientoGrabacionAt: integer("consentimiento_grabacion_at", { mode: "timestamp_ms" }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -300,4 +302,60 @@ export const bitacora = sqliteTable(
     fecha: createdAt(),
   },
   (t) => [index("bitacora_entidad_idx").on(t.entidad, t.entidadId)],
+);
+
+/* ───────────────────────── Grabación de sesiones ───────────────────────── */
+
+export const ESTADOS_GRABACION = ["grabando", "finalizada", "procesando", "lista", "error"] as const;
+
+/** Audio de una sesión presencial (una por cita) y lo que la IA obtuvo de él. */
+export const grabacionesSesion = sqliteTable(
+  "grabaciones_sesion",
+  {
+    id: id(),
+    citaId: text("cita_id")
+      .notNull()
+      .references(() => citas.id, { onDelete: "cascade" }),
+    psicologoId: text("psicologo_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    consultanteId: text("consultante_id")
+      .notNull()
+      .references(() => consultantes.id, { onDelete: "cascade" }),
+    estado: text("estado", { enum: ESTADOS_GRABACION }).notNull().default("grabando"),
+    duracionMs: integer("duracion_ms").notNull().default(0),
+    transcripcion: text("transcripcion", { mode: "json" }),
+    propuesta: text("propuesta", { mode: "json" }),
+    error: text("error"),
+    // El audio se borra 30 días después de finalizar la sesión.
+    audioBorrarEn: integer("audio_borrar_en", { mode: "timestamp_ms" }),
+    audioBorradoAt: integer("audio_borrado_at", { mode: "timestamp_ms" }),
+    procesadaAt: integer("procesada_at", { mode: "timestamp_ms" }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex("grabaciones_cita_unique_idx").on(t.citaId),
+    index("grabaciones_borrar_idx").on(t.audioBorrarEn),
+  ],
+);
+
+/** Fragmentos de audio independientes (~3 min) que componen una grabación. */
+export const grabacionFragmentos = sqliteTable(
+  "grabacion_fragmentos",
+  {
+    id: id(),
+    grabacionId: text("grabacion_id")
+      .notNull()
+      .references(() => grabacionesSesion.id, { onDelete: "cascade" }),
+    indice: integer("indice").notNull(),
+    pathname: text("pathname").notNull(),
+    mimeType: text("mime_type").notNull(),
+    // Posición del fragmento dentro de la sesión, para unir la transcripción.
+    inicioMs: integer("inicio_ms").notNull(),
+    duracionMs: integer("duracion_ms").notNull(),
+    bytes: integer("bytes").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("fragmentos_grabacion_indice_idx").on(t.grabacionId, t.indice)],
 );
