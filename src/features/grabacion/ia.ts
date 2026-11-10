@@ -1,6 +1,6 @@
 import "server-only";
 import { groq, type GroqTranscriptionModelOptions } from "@ai-sdk/groq";
-import { generateText, Output, transcribe } from "ai";
+import { generateText, NoObjectGeneratedError, Output, transcribe } from "ai";
 import { env } from "@/lib/env";
 import { type PropuestaIa, propuestaIaSchema, type Segmento, segmentosParaModelo } from "./schemas";
 
@@ -37,7 +37,7 @@ export async function transcribirFragmento(audio: Uint8Array) {
 const SISTEMA = `Eres asistente clínico de un psicólogo en México. Recibes la transcripción de una sesión de psicoterapia en segmentos numerados, sin indicar quién habla.
 
 Tareas:
-1. Divide la transcripción en turnos de habla e identifica quién dice cada uno: "psicologo" (pregunta, guía, interviene, asigna tareas) o "consultante" (relata su experiencia). Los segmentos se cortaron por pausas, no por hablante: si en un mismo segmento hablan los dos, sepáralo en varios turnos con el mismo índice. Copia el texto literal y completo, sin resumir, corregir ni omitir nada.
+1. Identifica quién habla en cada segmento: "psicologo" (pregunta, guía, interviene, asigna tareas) o "consultante" (relata su experiencia). Devuelve solo los cambios de hablante: el índice del segmento donde empieza a hablar cada uno, empezando por el segmento 0. No copies el texto de la transcripción. Si en un segmento hablan los dos, márcalo con quien habla más en él.
 2. Redacta la nota de evolución en formato SOAP, en español clínico, conciso y en tercera persona ("el consultante refiere…").
 
 Reglas estrictas:
@@ -55,26 +55,45 @@ export type ContextoRedaccion = {
   notaAnterior: string | null;
 };
 
-/** Pide al modelo los hablantes y la propuesta SOAP. Si falla el principal, AI Gateway usa el respaldo. */
+/**
+ * Pide al modelo los hablantes y la propuesta SOAP. Si el proveedor falla, AI Gateway pasa
+ * al respaldo; si responde pero el JSON llega cortado o malformado, se reintenta con el respaldo.
+ */
 export async function redactarPropuesta(contexto: ContextoRedaccion): Promise<PropuestaIa> {
   const escrito = Object.entries(contexto.escrito)
     .filter(([, v]) => v?.trim())
     .map(([k, v]) => `- ${k}: ${v}`)
     .join("\n");
   const expediente = contexto.expediente.map((e) => `- ${e.label}: ${e.valor}`).join("\n");
+  const prompt = [
+    `## Transcripción\n${segmentosParaModelo(contexto.segmentos)}`,
+    `## Lo que el psicólogo ya escribió\n${escrito || "(nada)"}`,
+    `## Expediente (contexto)\n${expediente || "(sin datos)"}`,
+    `## Nota de la sesión anterior (contexto)\n${contexto.notaAnterior || "(es la primera sesión registrada)"}`,
+  ].join("\n\n");
 
-  const { output } = await generateText({
-    model: MODELO_REDACCION,
-    system: SISTEMA,
-    temperature: 0.2,
-    output: Output.object({ schema: propuestaIaSchema, name: "nota_soap" }),
-    providerOptions: { gateway: { models: [MODELO_RESPALDO] } },
-    prompt: [
-      `## Transcripción\n${segmentosParaModelo(contexto.segmentos)}`,
-      `## Lo que el psicólogo ya escribió\n${escrito || "(nada)"}`,
-      `## Expediente (contexto)\n${expediente || "(sin datos)"}`,
-      `## Nota de la sesión anterior (contexto)\n${contexto.notaAnterior || "(es la primera sesión registrada)"}`,
-    ].join("\n\n"),
-  });
-  return output;
+  const generar = async (modelo: string, respaldos: string[]) => {
+    const { output } = await generateText({
+      model: modelo,
+      system: SISTEMA,
+      temperature: 0.2,
+      // Holgura para el razonamiento del modelo; la respuesta en sí es corta.
+      maxOutputTokens: 16_000,
+      output: Output.object({ schema: propuestaIaSchema, name: "nota_soap" }),
+      providerOptions: { gateway: { models: respaldos } },
+      prompt,
+    });
+    return output;
+  };
+
+  try {
+    return await generar(MODELO_REDACCION, [MODELO_RESPALDO]);
+  } catch (error) {
+    if (!NoObjectGeneratedError.isInstance(error)) throw error;
+    console.warn("[ia] respuesta inválida del modelo principal, reintentando con el respaldo", {
+      finishReason: error.finishReason,
+      usage: error.usage,
+    });
+    return await generar(MODELO_RESPALDO, []);
+  }
 }

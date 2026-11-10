@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { construirTurnos, segmentosParaModelo, unirFragmentos } from "./schemas";
+import { asignarHablantes, segmentosParaModelo, unirFragmentos } from "./schemas";
 
 describe("unirFragmentos", () => {
   it("ordena los fragmentos, desplaza los tiempos y quita segmentos vacíos", () => {
@@ -20,41 +20,40 @@ describe("unirFragmentos", () => {
   });
 });
 
-describe("construirTurnos", () => {
-  // Whisper juntó pregunta y respuesta en el primer segmento.
+describe("asignarHablantes", () => {
   const base = unirFragmentos([
     {
       inicioMs: 0,
       segmentos: [
-        { texto: "¿Cómo estás? Mejor, gracias.", inicioSeg: 0, finSeg: 3 },
-        { texto: "Me alegra.", inicioSeg: 3, finSeg: 4 },
+        { texto: "¿Cómo llegas hoy?", inicioSeg: 0, finSeg: 2 },
+        { texto: "Bien, algo cansada.", inicioSeg: 2, finSeg: 4 },
+        { texto: "Dormí poco esta semana.", inicioSeg: 4, finSeg: 6 },
+        { texto: "¿Qué crees que influyó?", inicioSeg: 6, finSeg: 8 },
       ],
     },
   ]);
 
-  it("separa un segmento con dos hablantes y conserva el tiempo de inicio", () => {
-    const r = construirTurnos(base, [
-      { indice: 0, hablante: "psicologo", texto: "¿Cómo estás?" },
-      { indice: 0, hablante: "consultante", texto: "Mejor, gracias." },
-      { indice: 1, hablante: "psicologo", texto: "Me alegra." },
+  it("cada segmento hereda el hablante del último cambio y conserva el texto literal", () => {
+    const r = asignarHablantes(base, [
+      { indice: 0, hablante: "psicologo" },
+      { indice: 1, hablante: "consultante" },
+      { indice: 3, hablante: "psicologo" },
     ]);
     expect(r.map((s) => [s.hablante, s.texto, s.inicioMs])).toEqual([
-      ["psicologo", "¿Cómo estás?", 0],
-      ["consultante", "Mejor, gracias.", 0],
-      ["psicologo", "Me alegra.", 3000],
+      ["psicologo", "¿Cómo llegas hoy?", 0],
+      ["consultante", "Bien, algo cansada.", 2000],
+      ["consultante", "Dormí poco esta semana.", 4000],
+      ["psicologo", "¿Qué crees que influyó?", 6000],
     ]);
   });
 
-  it("si el modelo resumió, conserva el texto literal y solo toma los hablantes", () => {
-    const r = construirTurnos(base, [{ indice: 0, hablante: "consultante", texto: "Está bien." }]);
-    expect(r.map((s) => [s.hablante, s.texto])).toEqual([
-      ["consultante", "¿Cómo estás? Mejor, gracias."],
-      [null, "Me alegra."],
-    ]);
+  it("los segmentos antes del primer cambio quedan sin hablante", () => {
+    const r = asignarHablantes(base, [{ indice: 2, hablante: "consultante" }]);
+    expect(r.map((s) => s.hablante)).toEqual([null, null, "consultante", "consultante"]);
   });
 
-  it("ignora turnos con índices fuera de rango", () => {
-    const r = construirTurnos(base, [{ indice: 9, hablante: "psicologo", texto: "x" }]);
+  it("ignora cambios con índices fuera de rango", () => {
+    const r = asignarHablantes(base, [{ indice: 9, hablante: "psicologo" }]);
     expect(r.every((s) => s.hablante === null)).toBe(true);
   });
 });

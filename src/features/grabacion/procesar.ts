@@ -8,7 +8,7 @@ import { type CampoExpediente, SECCIONES_EXPEDIENTE } from "@/features/expedient
 import { CAMPOS_SOAP } from "@/features/sesiones/schemas";
 import { redactarPropuesta, transcribirFragmento } from "./ia";
 import {
-  construirTurnos,
+  asignarHablantes,
   type PropuestaGuardada,
   type Transcripcion,
   unirFragmentos,
@@ -87,7 +87,7 @@ async function procesarGrabacion(grabacionId: string) {
           .limit(1)
       : [];
 
-    const { turnos, ...propuesta } = await redactarPropuesta({
+    const { cambiosHablante, ...propuesta } = await redactarPropuesta({
       segmentos,
       escrito: Object.fromEntries(
         [...CAMPOS_SOAP.map((c) => c.campo), "tareasAsignadas", "observaciones"].map((c) => [
@@ -112,7 +112,7 @@ async function procesarGrabacion(grabacionId: string) {
         : null,
     });
 
-    const transcripcion: Transcripcion = { segmentos: construirTurnos(segmentos, turnos) };
+    const transcripcion: Transcripcion = { segmentos: asignarHablantes(segmentos, cambiosHablante) };
     await db
       .update(grabacionesSesion)
       .set({

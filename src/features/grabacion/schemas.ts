@@ -19,17 +19,22 @@ export type Segmento = {
 
 export type Transcripcion = { segmentos: Segmento[] };
 
-/** Lo que devuelve el modelo: la transcripción por turnos de habla y la nota SOAP propuesta. */
+/**
+ * Lo que devuelve el modelo: dónde cambia quién habla y la nota SOAP propuesta. El texto de la
+ * transcripción no pasa por el modelo (ya es literal de Whisper): pedirle que lo copiara hacía
+ * que en sesiones largas la respuesta se cortara a medio JSON.
+ */
 export const propuestaIaSchema = z.object({
-  turnos: z
+  cambiosHablante: z
     .array(
       z.object({
-        indice: z.number().int().min(0).describe("Segmento numerado donde empieza el turno."),
+        indice: z.number().int().min(0).describe("Segmento numerado donde empieza a hablar."),
         hablante: z.enum(HABLANTES),
-        texto: z.string().describe("Texto literal del turno, sin resumir ni corregir."),
       }),
     )
-    .describe("La transcripción completa dividida en turnos: un turno por cada cambio de hablante."),
+    .describe(
+      "Solo los segmentos donde cambia quién habla, en orden; el primero es el segmento 0. Cada segmento hereda el hablante del cambio anterior.",
+    ),
   subjetivo: z.string().describe("Lo que el consultante reporta. Vacío si no hay información."),
   objetivo: z.string().describe("Lo observable en la sesión. Vacío si no hay información."),
   analisis: z.string().describe("Interpretación clínica breve. Vacío si no hay información."),
@@ -43,8 +48,8 @@ export const propuestaIaSchema = z.object({
 
 export type PropuestaIa = z.infer<typeof propuestaIaSchema>;
 
-/** La propuesta tal como se guarda: los turnos ya van dentro de la transcripción. */
-export type PropuestaGuardada = Omit<PropuestaIa, "turnos">;
+/** La propuesta tal como se guarda: los hablantes ya van dentro de la transcripción. */
+export type PropuestaGuardada = Omit<PropuestaIa, "cambiosHablante">;
 
 /** Campos de texto de la propuesta que se pueden pasar a la nota. */
 export const CAMPOS_PROPUESTA = [
@@ -79,32 +84,23 @@ export function unirFragmentos(
     );
 }
 
-const largo = (textos: string[]) => textos.reduce((n, t) => n + t.trim().length, 0);
-
 /**
- * Convierte los turnos del modelo en la transcripción final, con el tiempo del segmento
- * donde empieza cada turno. Whisper corta por pausas, no por hablante, así que un segmento
- * puede contener a los dos; por eso el modelo los separa.
- *
- * Si el modelo resumió o recortó (cubre menos del 80 % del texto original), se conserva
- * la transcripción literal de Whisper y solo se toma de él quién habla en cada segmento.
+ * Asigna a cada segmento literal de Whisper el hablante del último cambio que el modelo marcó
+ * en él o antes. Los segmentos previos al primer cambio quedan sin hablante (el psicólogo
+ * puede corregir cualquiera desde la transcripción).
  */
-export function construirTurnos(segmentos: Segmento[], turnos: PropuestaIa["turnos"]): Segmento[] {
-  const validos = turnos.filter((t) => t.indice < segmentos.length && t.texto.trim());
-  const cobertura = largo(validos.map((t) => t.texto)) / Math.max(1, largo(segmentos.map((s) => s.texto)));
+export function asignarHablantes(
+  segmentos: Segmento[],
+  cambios: PropuestaIa["cambiosHablante"],
+): Segmento[] {
+  const enSegmento = new Map<number, Hablante>();
+  for (const c of cambios) if (c.indice < segmentos.length) enSegmento.set(c.indice, c.hablante);
 
-  if (validos.length === 0 || cobertura < 0.8) {
-    const primero = new Map<number, Hablante>();
-    for (const t of validos) if (!primero.has(t.indice)) primero.set(t.indice, t.hablante);
-    return segmentos.map((s, i) => ({ ...s, hablante: primero.get(i) ?? null }));
-  }
-
-  return validos.map((t) => ({
-    inicioMs: segmentos[t.indice].inicioMs,
-    finMs: segmentos[t.indice].finMs,
-    texto: t.texto.trim(),
-    hablante: t.hablante,
-  }));
+  let actual: Hablante | null = null;
+  return segmentos.map((s, i) => {
+    actual = enSegmento.get(i) ?? actual;
+    return { ...s, hablante: actual };
+  });
 }
 
 /** "[3] (01:12) texto" — formato compacto que recibe el modelo. */
